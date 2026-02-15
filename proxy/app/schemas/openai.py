@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 from typing import Any
 
@@ -59,7 +60,7 @@ def chat_completion_response(
     return {
         "id": completion_id,
         "object": "chat.completion",
-        "created": 0,
+        "created": int(time.time()),
         "model": model,
         "choices": [
             {

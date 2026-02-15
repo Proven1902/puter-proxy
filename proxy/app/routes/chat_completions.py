@@ -123,24 +123,41 @@ async def create_chat_completion(request: Request) -> JSONResponse:
         tools = tools_raw
 
     normalized_messages: list[dict[str, Any]] = []
-    for item in messages:
+    for index, item in enumerate(messages):
         if not isinstance(item, dict):
-            continue
+            return JSONResponse(
+                status_code=400,
+                content=error_body(
+                    code="invalid_request",
+                    message=f"messages[{index}] must be an object",
+                    request_id=request_id,
+                ),
+            )
+
         role = item.get("role")
         content = item.get("content")
-        if not isinstance(role, str) or not isinstance(content, str):
-            continue
-        normalized_messages.append({"role": role, "content": content})
 
-    if not normalized_messages:
-        return JSONResponse(
-            status_code=400,
-            content=error_body(
-                code="invalid_request",
-                message="No valid messages found",
-                request_id=request_id,
-            ),
-        )
+        if not isinstance(role, str) or role.strip() == "":
+            return JSONResponse(
+                status_code=400,
+                content=error_body(
+                    code="invalid_request",
+                    message=f"messages[{index}].role must be a non-empty string",
+                    request_id=request_id,
+                ),
+            )
+
+        if not isinstance(content, str) or content.strip() == "":
+            return JSONResponse(
+                status_code=400,
+                content=error_body(
+                    code="invalid_request",
+                    message=f"messages[{index}].content must be a non-empty string",
+                    request_id=request_id,
+                ),
+            )
+
+        normalized_messages.append({"role": role, "content": content})
 
     client = PuterClient(token=CONFIG.puter_token)
 
