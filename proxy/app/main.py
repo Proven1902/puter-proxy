@@ -1,10 +1,6 @@
-from importlib import import_module
+from fastapi import FastAPI
 
-
-FastAPI = import_module("fastapi").FastAPI
-config_module = import_module("proxy.app.config")
-CONFIG = config_module.CONFIG
-validate_startup_guardrails = config_module.validate_startup_guardrails
+from proxy.app.config import CONFIG, validate_startup_guardrails
 
 
 validate_startup_guardrails(CONFIG)
