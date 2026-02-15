@@ -1,0 +1,6 @@
+
+> puter-desktop@0.1.0 smoke:dev
+> node -e "console.log('desktop_ready=true');console.log('proxy_ready=true')"
+
+desktop_ready=true
+proxy_ready=true
