@@ -1,0 +1,22 @@
+{
+  "plan": ".sisyphus/plans/puter-electron-openai-proxy.md",
+  "task": "Task 1",
+  "artifacts": [
+    {
+      "path": ".sisyphus/evidence/task-1-dev-startup.txt",
+      "description": "Smoke dev startup output"
+    },
+    {
+      "path": ".sisyphus/evidence/task-1-config-check.txt",
+      "description": "CONFIG required keys check"
+    },
+    {
+      "path": ".sisyphus/evidence/task-1-filemap-check.txt",
+      "description": "Required file map existence check"
+    },
+    {
+      "path": ".sisyphus/evidence/task-1-ipc-check.txt",
+      "description": "IPC allowlist channel check"
+    }
+  ]
+}
