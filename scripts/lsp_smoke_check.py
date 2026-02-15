@@ -5,8 +5,8 @@ import time
 
 
 def main() -> int:
-    cfg_path = pathlib.Path("C:/Users/admin/Desktop/projects/puterapp/.opencode/oh-my-opencode.json")
-    project_dir = pathlib.Path("C:/Users/admin/Desktop/projects/puterapp")
+    cfg_path = pathlib.Path(".opencode/oh-my-opencode.json")
+    project_dir = pathlib.Path.cwd()
 
     config = json.loads(cfg_path.read_text(encoding="utf-8"))
     lsp = config.get("lsp", {})
