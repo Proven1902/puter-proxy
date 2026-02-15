@@ -3,6 +3,9 @@
 
 .sisyphus/drafts/
 .sisyphus/boulder.json
+.sisyphus/secrets/
+
+.env.local
 
 .opencode/node_modules/
 .opencode/.npm/
