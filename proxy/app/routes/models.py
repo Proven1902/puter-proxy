@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 import uuid
 from typing import Any
 
@@ -37,7 +38,7 @@ def get_models(request: Request) -> JSONResponse:
         row: dict[str, Any] = {
             "id": model.id,
             "object": "model",
-            "created": 0,
+            "created": int(time.time()),
             "owned_by": model.provider or "puter",
         }
         if model.name:
