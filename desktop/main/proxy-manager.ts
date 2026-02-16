@@ -152,6 +152,7 @@ export class ProxyManager {
   private readonly logs: LogEntry[] = [];
   private readonly logsLimit = 500;
   private healthPollTimer: NodeJS.Timeout | null = null;
+  private healthPollGeneration = 0;
   private stopRequested = false;
 
   constructor(options?: Partial<ProxyManagerOptions>) {
@@ -486,20 +487,41 @@ export class ProxyManager {
   }
 
   private startHealthPolling(): void {
+    const generation = ++this.healthPollGeneration;
     this.stopHealthPolling();
     this.healthPollTimer = setInterval(async () => {
+      if (generation !== this.healthPollGeneration) {
+        return;
+      }
+
       if (!this.process || this.state !== "running") {
         return;
       }
 
+      const pidAtTick = this.process.pid;
       const healthy = await fetchHealthz(this.options.healthzUrl, this.options.healthPollTimeoutMs);
+      if (generation !== this.healthPollGeneration) {
+        return;
+      }
+
+      if (!this.process || this.state !== "running") {
+        return;
+      }
+
+      if (this.process.pid !== pidAtTick) {
+        return;
+      }
+
       if (!healthy) {
-        this.log("WARN", "proxy.health", "Healthz probe failed while running");
+        this.log("WARN", "proxy.health", "Healthz probe failed while running", {
+          pid: pidAtTick,
+        });
       }
     }, this.options.healthPollIntervalMs);
   }
 
   private stopHealthPolling(): void {
+    this.healthPollGeneration += 1;
     if (!this.healthPollTimer) {
       return;
     }

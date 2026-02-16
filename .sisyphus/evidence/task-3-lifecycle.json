@@ -1,25 +1,25 @@
 {
   "start": {
     "status": "running",
-    "pid": 2872,
+    "pid": 4560,
     "retries_in_window": 0,
-    "last_transition_at": "2026-02-16T08:53:58.406Z"
+    "last_transition_at": "2026-02-16T09:37:36.878Z"
   },
   "statusAfterStart": {
     "status": "running",
-    "pid": 2872,
+    "pid": 4560,
     "retries_in_window": 0,
-    "last_transition_at": "2026-02-16T08:53:58.406Z"
+    "last_transition_at": "2026-02-16T09:37:36.878Z"
   },
   "restart": {
     "status": "running",
-    "pid": 6856,
+    "pid": 18428,
     "retries_in_window": 0,
-    "last_transition_at": "2026-02-16T08:53:59.341Z"
+    "last_transition_at": "2026-02-16T09:37:37.818Z"
   },
   "stop": {
     "status": "stopped",
     "retries_in_window": 0,
-    "last_transition_at": "2026-02-16T08:53:59.596Z"
+    "last_transition_at": "2026-02-16T09:37:38.080Z"
   }
 }
