@@ -27,4 +27,5 @@ proxy/logs/
 desktop/dist/
 desktop/.tmp-task3/
 desktop/.tmp-task5/
+desktop/.tmp-task7/
 desktop/node_modules/
