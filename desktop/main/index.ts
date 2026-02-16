@@ -11,7 +11,6 @@ import {
   type IpcResponseMap,
 } from "./ipc";
 import { proxyManager, type LogEntry, type ProxyManagerError } from "./proxy-manager";
-import { createTokenSecureStore } from "./security-store";
 
 export interface IpcMainLike {
   handle(channel: string, handler: (_event: unknown, payload?: unknown) => Promise<unknown> | unknown): void;
@@ -23,40 +22,9 @@ interface TokenState {
 }
 
 const tokenState: TokenState = {
-  value: "",
-  masked: false,
+  value: desktopRuntimeConfig.puterToken,
+  masked: desktopRuntimeConfig.puterToken.length > 0,
 };
-
-const tokenStore = createTokenSecureStore();
-
-function applyTokenToRuntime(token: string): void {
-  tokenState.value = token;
-  tokenState.masked = token.length > 0;
-  if (token.length > 0) {
-    proxyManager.setPuterToken(token);
-    return;
-  }
-
-  proxyManager.clearPuterToken();
-}
-
-function initializeTokenState(): void {
-  let token = "";
-
-  if (desktopRuntimeConfig.puterToken) {
-    token = desktopRuntimeConfig.puterToken;
-  } else {
-    try {
-      token = tokenStore.loadToken();
-    } catch {
-      token = "";
-    }
-  }
-
-  applyTokenToRuntime(token);
-}
-
-initializeTokenState();
 
 function normalizeError(err: unknown): ProxyManagerError {
   if (
@@ -167,23 +135,18 @@ async function handleProxyChannel(channel: IpcChannel, payload: unknown): Promis
     }
 
     if (channel === IPC_CHANNELS.PROXY_STATUS) {
-      const status = proxyManager.status();
-      return okResponse<IpcResponseMap["proxy.status"]>({
-        ...status,
-        token_masked: tokenState.masked,
-      });
+      return okResponse<IpcResponseMap["proxy.status"]>(proxyManager.status());
     }
 
     if (channel === IPC_CHANNELS.TOKEN_SAVE) {
-      const token = extractToken(payload);
-      tokenStore.saveToken(token);
-      applyTokenToRuntime(token);
+      tokenState.value = extractToken(payload);
+      tokenState.masked = true;
       return okResponse<IpcResponseMap["token.save"]>({ saved: true });
     }
 
     if (channel === IPC_CHANNELS.TOKEN_CLEAR) {
-      tokenStore.clearToken();
-      applyTokenToRuntime("");
+      tokenState.value = "";
+      tokenState.masked = false;
       return okResponse<IpcResponseMap["token.clear"]>({ cleared: true });
     }
 

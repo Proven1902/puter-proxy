@@ -13,8 +13,7 @@ export interface ProxyManagerError {
     | "python_runtime_missing"
     | "proxy_unavailable"
     | "internal_error"
-    | "proxy_feature_disabled"
-    | "secure_store_unavailable";
+    | "proxy_feature_disabled";
   message: string;
   details?: Record<string, unknown>;
 }
@@ -103,8 +102,8 @@ async function fetchHealthz(url: string, timeoutMs: number): Promise<boolean> {
   }
 }
 
-function sanitizeLogMessage(input: string, tokenRaw: string): string {
-  const token = tokenRaw.trim();
+function sanitizeLogMessage(input: string): string {
+  const token = desktopRuntimeConfig.puterToken?.trim();
   if (!token) {
     return input;
   }
@@ -155,30 +154,11 @@ export class ProxyManager {
   private healthPollTimer: NodeJS.Timeout | null = null;
   private healthPollGeneration = 0;
   private stopRequested = false;
-  private puterToken = "";
 
   constructor(options?: Partial<ProxyManagerOptions>) {
     this.options = {
       ...baseOptions(),
       ...options,
-    };
-
-    this.puterToken = this.options.env.PUTER_TOKEN?.trim() || "";
-  }
-
-  public setPuterToken(token: string): void {
-    this.puterToken = token.trim();
-    this.options.env = {
-      ...this.options.env,
-      PUTER_TOKEN: this.puterToken,
-    };
-  }
-
-  public clearPuterToken(): void {
-    this.puterToken = "";
-    this.options.env = {
-      ...this.options.env,
-      PUTER_TOKEN: "",
     };
   }
 
@@ -346,11 +326,11 @@ export class ProxyManager {
 
   private attachProcessListeners(proc: ChildProcessWithoutNullStreams): void {
     proc.stdout.on("data", (chunk: Buffer | string) => {
-      this.log("INFO", "proxy.stdout", sanitizeLogMessage(String(chunk).trim(), this.puterToken));
+      this.log("INFO", "proxy.stdout", sanitizeLogMessage(String(chunk).trim()));
     });
 
     proc.stderr.on("data", (chunk: Buffer | string) => {
-      const msg = sanitizeLogMessage(String(chunk).trim(), this.puterToken);
+      const msg = sanitizeLogMessage(String(chunk).trim());
       if (msg.length > 0) {
         this.log("WARN", "proxy.stderr", msg);
       }

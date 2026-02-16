@@ -35,7 +35,6 @@ export interface ProxyStatusPayload {
   last_transition_at?: string;
   error_code?: string;
   error_message?: string;
-  token_masked?: boolean;
 }
 
 export interface IpcLogEntry {
