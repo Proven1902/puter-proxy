@@ -71,17 +71,28 @@ export function useProxyController() {
     }
   }, []);
 
+  const handlePollingError = useCallback((err: unknown) => {
+    const message = err instanceof Error ? err.message : "Background refresh failed";
+    setBanner((previous) =>
+      previous ?? {
+        level: "warning",
+        code: "refresh_failed",
+        message,
+      },
+    );
+  }, []);
+
   useEffect(() => {
-    void refreshStatus();
-    void refreshLogs();
+    refreshStatus().catch(handlePollingError);
+    refreshLogs().catch(handlePollingError);
 
     const timer = window.setInterval(() => {
-      void refreshStatus();
-      void refreshLogs();
+      refreshStatus().catch(handlePollingError);
+      refreshLogs().catch(handlePollingError);
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [refreshLogs, refreshStatus]);
+  }, [handlePollingError, refreshLogs, refreshStatus]);
 
   const invokeLifecycle = useCallback(async (action: "start" | "stop" | "restart") => {
     setBusy(true);
