@@ -1,0 +1,5 @@
+
+> puter-desktop@0.1.0 task3:smoke
+> node scripts/task3-smoke.mjs
+
+task3_smoke_ok=true

@@ -1,0 +1,4 @@
+code=proxy_unavailable
+message=Proxy failed to start after 3 attempts
+status=error
+retries_in_window=3

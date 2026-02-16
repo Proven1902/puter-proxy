@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": "port_in_use",
+    "message": "Port 127.0.0.1:11435 is already in use",
+    "details": {
+      "host": "127.0.0.1",
+      "port": 11435
+    }
+  }
+}

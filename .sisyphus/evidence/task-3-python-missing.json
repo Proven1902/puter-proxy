@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "python_runtime_missing",
+    "message": "Python runtime not found: nonexistent-python-binary-task3",
+    "details": {}
+  }
+}

@@ -509,6 +509,11 @@ proxy/tests/                    # Task 7 owner (pytest)
   **What to do**:
   - Implement controls: token input/save, start/stop/restart, status indicator, log tail panel.
   - Add validation and inline error banners for invalid token/proxy unavailable states.
+  - Run an integration tuning pass for ProxyManager lifecycle timing under UI-driven transitions
+    (rapid start/stop/restart), and tune values if needed:
+    `startupTimeoutMs`, `restartBackoffMs`, `healthPollIntervalMs`, `healthPollTimeoutMs`, `postStopDrainMs`.
+  - Dependency exception for Task 4: allowed to adjust `desktop/main/proxy-manager.ts`
+    timing constants when Task 4 evidence shows lifecycle instability.
 
   **Must NOT do**:
   - No direct token display once saved (mask in UI).
@@ -538,6 +543,7 @@ proxy/tests/                    # Task 7 owner (pytest)
   - [ ] UI parity with `react-app7.js` is proven by passing all relevant Design QA Matrix rows and evidence files (`ui-overview-initial.png`, `ui-navigation-routes.png`, `ui-proxy-running.png`, `ui-proxy-stopped.png`, `ui-proxy-error.png`).
   - [ ] Error/warn banners exist for invalid token, proxy-down, and stream-unsupported cases.
   - [ ] UI never directly accesses process spawn or secure store APIs (IPC-only).
+  - [ ] Lifecycle integration tuning passes: rapid `start/stop/restart` interactions do not produce stale health-poll state/log artifacts, and final status is deterministic (verified by Task 4 lifecycle tuning evidence).
 
   **Agent-Executed QA Scenarios**:
 
@@ -563,6 +569,17 @@ proxy/tests/                    # Task 7 owner (pytest)
       3. Assert alert contains "Unauthorized" and remediation hint
     Expected Result: Error surfaced without crash
     Evidence: .sisyphus/evidence/task-4-invalid-token.png
+
+  Scenario: Lifecycle timing remains stable under rapid UI actions (Task 4 integration tuning)
+    Tool: Playwright + Bash
+    Preconditions: Desktop app running in dev mode with proxy manager enabled
+    Steps:
+      1. Execute rapid action sequence from UI: start -> stop -> restart -> stop (with short intervals)
+      2. Poll status badge after each action and assert deterministic terminal state for each step
+      3. Assert no stale status regressions after terminal state (e.g., stopped -> running without user action)
+      4. Export relevant log tail/status timeline snapshot
+    Expected Result: No lifecycle race artifacts visible from UI path; transitions remain deterministic
+    Evidence: .sisyphus/evidence/task-4-lifecycle-tuning.txt
   ```
 
 - [ ] 5. Add secure token persistence and request authorization plumbing

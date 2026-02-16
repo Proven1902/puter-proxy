@@ -25,3 +25,5 @@ Thumbs.db
 
 proxy/logs/
 desktop/dist/
+desktop/.tmp-task3/
+desktop/node_modules/

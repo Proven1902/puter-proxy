@@ -2,13 +2,19 @@
   "name": "puter-desktop",
   "version": "0.1.0",
   "private": true,
+  "type": "commonjs",
   "description": "Wave 1 scaffold for Electron control plane",
   "scripts": {
+    "task3:smoke": "node scripts/task3-smoke.mjs",
     "dev": "node -e \"console.log('desktop_dev_ready=true')\"",
     "build": "node -e \"console.log('desktop_build_ready=true')\"",
     "lint": "node -e \"console.log('desktop_lint_ready=true')\"",
     "test": "node -e \"console.log('desktop_test_ready=true')\"",
     "smoke:dev": "node -e \"console.log('desktop_ready=true');console.log('proxy_ready=true')\"",
     "smoke:packaged": "node -e \"console.log('packaged_ready=true');console.log('proxy_ready=true')\""
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
   }
 }
