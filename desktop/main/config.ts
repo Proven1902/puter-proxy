@@ -30,7 +30,7 @@ function parsePort(raw: string | undefined): number {
 function parseHost(raw: string | undefined): string {
   const host = raw?.trim() || "127.0.0.1";
 
-  if (host !== "127.0.0.1" && host !== "localhost") {
+  if (host !== "127.0.0.1") {
     throw new Error(`Invalid HOST value for MVP localhost-only mode: ${host}`);
   }
 

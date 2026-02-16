@@ -1,6 +1,6 @@
 {
   "plan": ".sisyphus/plans/puter-electron-openai-proxy.md",
-  "task": "Task 1-4",
+  "task": "Task 1-6",
   "artifacts": [
     {
       "path": ".sisyphus/evidence/task-1-dev-startup.txt",
@@ -109,6 +109,30 @@
     {
       "path": ".sisyphus/evidence/task-4-ui-build.txt",
       "description": "Task 4 renderer build command output"
+    },
+    {
+      "path": ".sisyphus/evidence/task-5-persist-restart.txt",
+      "description": "Task 5 secure token persistence survives process restart while remaining masked"
+    },
+    {
+      "path": ".sisyphus/evidence/task-5-redaction-check.txt",
+      "description": "Task 5 token redaction scan count for proxy logs"
+    },
+    {
+      "path": ".sisyphus/evidence/task-6-unauthorized.json",
+      "description": "Task 6 structured unauthorized error payload evidence"
+    },
+    {
+      "path": ".sisyphus/evidence/task-6-bind-guardrail.txt",
+      "description": "Task 6 localhost bind guardrail startup failure evidence"
+    },
+    {
+      "path": ".sisyphus/evidence/task-6-error-codes.json",
+      "description": "Task 6 stable error code set coverage summary"
+    },
+    {
+      "path": ".sisyphus/evidence/task-6-structured-logs.txt",
+      "description": "Task 6 metadata-only structured log sample"
     }
   ]
 }

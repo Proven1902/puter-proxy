@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "token_missing",
+    "message": "Puter token is not configured",
+    "request_id": "req_fba593190cf14a13b4d3375db24ebd8c"
+  }
+}

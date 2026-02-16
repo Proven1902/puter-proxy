@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import time
-import uuid
 from typing import Any
 
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from proxy.app.adapters.puter_client import PuterClientError
+from proxy.app.request_context import get_request_id
 from proxy.app.schemas.openai import error_body, models_response
 from proxy.app.services.auth import build_puter_client
 
@@ -16,13 +16,19 @@ router = APIRouter(tags=["models"])
 
 @router.get("/v1/models")
 def get_models(request: Request) -> JSONResponse:
-    request_id = request.headers.get("x-request-id") or f"req_{uuid.uuid4().hex}"
+    request_id = get_request_id(request)
+    request.state.model = None
     client = build_puter_client()
 
     try:
         models = client.list_models()
     except PuterClientError as exc:
-        status_code = 401 if exc.code in {"unauthorized", "token_missing"} else 502
+        if exc.code in {"unauthorized", "token_missing"}:
+            status_code = 401
+        elif exc.code == "upstream_timeout":
+            status_code = 504
+        else:
+            status_code = 502
         return JSONResponse(
             status_code=status_code,
             content=error_body(
