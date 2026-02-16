@@ -7,9 +7,6 @@ from typing import Any
 import httpx
 
 
-_HTTP_CLIENT = httpx.Client()
-
-
 class PuterClientError(Exception):
     def __init__(self, *, code: str, message: str, details: dict[str, Any] | None = None) -> None:
         super().__init__(message)
@@ -49,7 +46,8 @@ class PuterClient:
 
         url = "https://api.puter.com/puterai/chat/models/details"
         try:
-            response = _HTTP_CLIENT.get(url, headers=self._headers(), timeout=self._timeout)
+            with httpx.Client(timeout=self._timeout) as client:
+                response = client.get(url, headers=self._headers())
         except httpx.TimeoutException as exc:
             raise PuterClientError(code="upstream_timeout", message="Puter models request timed out") from exc
         except httpx.HTTPError as exc:
@@ -121,7 +119,8 @@ class PuterClient:
         }
 
         try:
-            response = _HTTP_CLIENT.post(url, headers=self._headers(), json=payload, timeout=self._timeout)
+            with httpx.Client(timeout=self._timeout) as client:
+                response = client.post(url, headers=self._headers(), json=payload)
         except httpx.TimeoutException as exc:
             raise PuterClientError(code="upstream_timeout", message="Puter chat request timed out") from exc
         except httpx.HTTPError as exc:
