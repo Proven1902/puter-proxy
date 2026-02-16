@@ -8,6 +8,8 @@ from typing import Any
 
 LOGGER = logging.getLogger("proxy.app")
 
+RESERVED_FIELDS = {"ts", "route", "status", "latency_ms", "request_id", "model"}
+
 
 def configure_proxy_logging(level: str) -> None:
     numeric = getattr(logging, level.upper(), logging.INFO)
@@ -40,6 +42,9 @@ def emit_request_log(
         payload["model"] = model
 
     if extra:
-        payload.update(extra)
+        for key, value in extra.items():
+            if key in RESERVED_FIELDS:
+                continue
+            payload[key] = value
 
     LOGGER.info(json.dumps(payload, ensure_ascii=False, sort_keys=True))

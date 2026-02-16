@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
@@ -77,21 +77,46 @@ function main() {
 
   writeFileSync(resolve(evidenceDir, "task-6-bind-guardrail.txt"), `${guardrailOutput.trim()}\n`, "utf-8");
 
-  const errorCodes = {
-    invalid_request: true,
-    unauthorized: true,
-    token_missing: true,
-    model_not_found: true,
-    streaming_not_supported: true,
-    upstream_timeout: true,
-    upstream_error: true,
-    proxy_unavailable: true,
-    port_in_use: true,
-    python_runtime_missing: true,
-    internal_error: true,
+  const requiredCodes = [
+    "invalid_request",
+    "unauthorized",
+    "token_missing",
+    "model_not_found",
+    "streaming_not_supported",
+    "upstream_timeout",
+    "upstream_error",
+    "proxy_unavailable",
+    "port_in_use",
+    "python_runtime_missing",
+    "internal_error",
+  ];
+
+  const sourceSnapshots = {
+    proxyMain: readFileSync(resolve(workspaceRoot, "proxy", "app", "main.py"), "utf-8"),
+    modelsRoute: readFileSync(resolve(workspaceRoot, "proxy", "app", "routes", "models.py"), "utf-8"),
+    chatRoute: readFileSync(resolve(workspaceRoot, "proxy", "app", "routes", "chat_completions.py"), "utf-8"),
+    puterClient: readFileSync(resolve(workspaceRoot, "proxy", "app", "adapters", "puter_client.py"), "utf-8"),
+    proxyManager: readFileSync(resolve(workspaceRoot, "desktop", "main", "proxy-manager.ts"), "utf-8"),
+    desktopIndex: readFileSync(resolve(workspaceRoot, "desktop", "main", "index.ts"), "utf-8"),
   };
 
-  writeFileSync(resolve(evidenceDir, "task-6-error-codes.json"), `${JSON.stringify(errorCodes, null, 2)}\n`, "utf-8");
+  const codeEvidence = {};
+  for (const code of requiredCodes) {
+    codeEvidence[code] = Object.values(sourceSnapshots).some((source) =>
+      source.includes(`\"${code}\"`) || source.includes(`'${code}'`) || source.includes(code),
+    );
+  }
+
+  const missingCodes = Object.entries(codeEvidence)
+    .filter(([, found]) => !found)
+    .map(([code]) => code);
+  assert(missingCodes.length === 0, `Missing required Task 6 codes in source: ${missingCodes.join(", ")}`);
+
+  writeFileSync(
+    resolve(evidenceDir, "task-6-error-codes.json"),
+    `${JSON.stringify({ required_codes: requiredCodes, discovered: codeEvidence }, null, 2)}\n`,
+    "utf-8",
+  );
 
   const logSample = runPython(
     [
@@ -104,7 +129,7 @@ function main() {
       "LOGGER.handlers.clear()",
       "LOGGER.addHandler(handler)",
       "LOGGER.setLevel(logging.INFO)",
-      "emit_request_log(route='/v1/models', status=401, latency_ms=12, model=None, request_id='req_task6', extra={'code': 'token_missing'})",
+      "emit_request_log(route='/v1/models', status=401, latency_ms=12, model=None, request_id='req_task6', extra={'code': 'token_missing', 'status': 999, 'route': '/override'})",
       "print(stream.getvalue().strip())",
     ].join("; "),
   );
@@ -114,6 +139,8 @@ function main() {
   assert(typeof parsedLog.status === "number", "Structured log missing status");
   assert(typeof parsedLog.latency_ms === "number", "Structured log missing latency_ms");
   assert(typeof parsedLog.request_id === "string", "Structured log missing request_id");
+  assert(parsedLog.status === 401, "Structured log must preserve core status field from arguments");
+  assert(parsedLog.route === "/v1/models", "Structured log must preserve core route field from arguments");
   assert(!("prompt" in parsedLog), "Structured log must not include prompt body");
   assert(!("response" in parsedLog), "Structured log must not include response body");
 

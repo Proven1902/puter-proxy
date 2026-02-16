@@ -1,13 +1,28 @@
 {
-  "invalid_request": true,
-  "unauthorized": true,
-  "token_missing": true,
-  "model_not_found": true,
-  "streaming_not_supported": true,
-  "upstream_timeout": true,
-  "upstream_error": true,
-  "proxy_unavailable": true,
-  "port_in_use": true,
-  "python_runtime_missing": true,
-  "internal_error": true
+  "required_codes": [
+    "invalid_request",
+    "unauthorized",
+    "token_missing",
+    "model_not_found",
+    "streaming_not_supported",
+    "upstream_timeout",
+    "upstream_error",
+    "proxy_unavailable",
+    "port_in_use",
+    "python_runtime_missing",
+    "internal_error"
+  ],
+  "discovered": {
+    "invalid_request": true,
+    "unauthorized": true,
+    "token_missing": true,
+    "model_not_found": true,
+    "streaming_not_supported": true,
+    "upstream_timeout": true,
+    "upstream_error": true,
+    "proxy_unavailable": true,
+    "port_in_use": true,
+    "python_runtime_missing": true,
+    "internal_error": true
+  }
 }
