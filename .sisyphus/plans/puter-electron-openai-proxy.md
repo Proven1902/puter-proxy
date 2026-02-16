@@ -751,10 +751,15 @@ proxy/tests/                    # Task 7 owner (pytest)
   - Validate packaged app starts proxy and serves OpenAI-compatible routes.
   - Produce release checklist and known limitations note.
   - Ensure `desktop/package.json` defines `dist:win` and `smoke:packaged` scripts.
+  - Apply Task 5 deferred security hardening in packaged runtime:
+    - migrate interim deterministic key derivation path in `desktop/main/security-store.ts` to OS-native keychain-backed secret handling,
+    - remove/forbid plaintext token exposure paths and enforce masked-only token metadata on externally reachable contracts.
 
   **Must NOT do**:
   - No cross-platform packaging in this MVP.
   - No auto-update implementation in V1.
+  - No deterministic encryption key derivation based only on public machine attributes in packaged mode.
+  - No exported/public API contract that returns plaintext token value.
 
   **Recommended Agent Profile**:
   - **Category**: `unspecified-high`
@@ -775,6 +780,8 @@ proxy/tests/                    # Task 7 owner (pytest)
   - [ ] API smoke checks pass against packaged runtime.
   - [ ] `npm --prefix desktop run smoke:packaged` exits `0` and captures packaged runtime evidence.
   - [ ] Preflight checks detect runtime prerequisites and return deterministic error codes when missing.
+  - [ ] Packaged runtime uses OS-native keychain-backed token secret path (no deterministic key derivation fallback from public machine attributes).
+  - [ ] Security audit confirms no plaintext token exposure through externally reachable status/introspection contracts (masked-only token metadata).
   - [ ] Evidence bundle complete under `.sisyphus/evidence/` with a valid `manifest.json` listing required artifacts.
 
   **Agent-Executed QA Scenarios**:
@@ -802,6 +809,17 @@ proxy/tests/                    # Task 7 owner (pytest)
       3. Assert clear token-required prompt and no crash
     Expected Result: Graceful failure with remediation path
     Evidence: .sisyphus/evidence/task-8-missing-token.png
+
+  Scenario: Task 5 deferred security hardening closure
+    Tool: Bash + Playwright
+    Preconditions: Windows packaged app built and launched
+    Steps:
+      1. Execute packaged token save/start flow.
+      2. Verify packaged runtime secret path is OS-native keychain-backed and deterministic key-derivation fallback is not active.
+      3. Query externally reachable status/introspection channels and assert token fields are masked-only (no plaintext token field).
+      4. Scan runtime logs for token-pattern leakage.
+    Expected Result: Task 5 deferred hardening items are closed in Task 8 without regressions.
+    Evidence: .sisyphus/evidence/task-8-security-hardening.txt
   ```
 
 ---

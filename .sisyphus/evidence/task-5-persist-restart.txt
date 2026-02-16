@@ -1,0 +1,4 @@
+task5_persist_restart_ok=true
+token_masked_after_save=true
+token_masked_after_clear=false
+secure_store_path=C:\Users\admin\Desktop\projects\puterapp\desktop\.tmp-task5\secure-store.json
