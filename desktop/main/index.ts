@@ -11,6 +11,7 @@ import {
   type IpcResponseMap,
 } from "./ipc";
 import { proxyManager, type LogEntry, type ProxyManagerError } from "./proxy-manager";
+import { createTokenSecureStore } from "./security-store";
 
 export interface IpcMainLike {
   handle(channel: string, handler: (_event: unknown, payload?: unknown) => Promise<unknown> | unknown): void;
@@ -21,10 +22,52 @@ interface TokenState {
   masked: boolean;
 }
 
+interface PublicTokenState {
+  masked: boolean;
+}
+
 const tokenState: TokenState = {
-  value: desktopRuntimeConfig.puterToken,
-  masked: desktopRuntimeConfig.puterToken.length > 0,
+  value: "",
+  masked: false,
 };
+
+const tokenStore = createTokenSecureStore();
+
+function applyTokenToRuntime(token: string): void {
+  tokenState.value = token;
+  tokenState.masked = token.length > 0;
+  if (token.length > 0) {
+    proxyManager.setPuterToken(token);
+    return;
+  }
+
+  proxyManager.clearPuterToken();
+}
+
+async function restartProxyIfRunning(): Promise<void> {
+  const status = proxyManager.status();
+  if (status.status === "running" || status.status === "starting") {
+    await proxyManager.restart();
+  }
+}
+
+function initializeTokenState(): void {
+  let token = "";
+
+  if (desktopRuntimeConfig.puterToken) {
+    token = desktopRuntimeConfig.puterToken;
+  } else {
+    try {
+      token = tokenStore.loadToken();
+    } catch {
+      token = "";
+    }
+  }
+
+  applyTokenToRuntime(token);
+}
+
+initializeTokenState();
 
 function normalizeError(err: unknown): ProxyManagerError {
   if (
@@ -135,18 +178,25 @@ async function handleProxyChannel(channel: IpcChannel, payload: unknown): Promis
     }
 
     if (channel === IPC_CHANNELS.PROXY_STATUS) {
-      return okResponse<IpcResponseMap["proxy.status"]>(proxyManager.status());
+      const status = proxyManager.status();
+      return okResponse<IpcResponseMap["proxy.status"]>({
+        ...status,
+        token_masked: tokenState.masked,
+      });
     }
 
     if (channel === IPC_CHANNELS.TOKEN_SAVE) {
-      tokenState.value = extractToken(payload);
-      tokenState.masked = true;
+      const token = extractToken(payload);
+      tokenStore.saveToken(token);
+      applyTokenToRuntime(token);
+      await restartProxyIfRunning();
       return okResponse<IpcResponseMap["token.save"]>({ saved: true });
     }
 
     if (channel === IPC_CHANNELS.TOKEN_CLEAR) {
-      tokenState.value = "";
-      tokenState.masked = false;
+      tokenStore.clearToken();
+      applyTokenToRuntime("");
+      await restartProxyIfRunning();
       return okResponse<IpcResponseMap["token.clear"]>({ cleared: true });
     }
 
@@ -190,9 +240,8 @@ export function registerIpcHandlers(ipcMain: IpcMainLike): void {
   }
 }
 
-export function getTokenState(): TokenState {
+export function getTokenState(): PublicTokenState {
   return {
-    value: tokenState.value,
     masked: tokenState.masked,
   };
 }
