@@ -34,11 +34,12 @@ def get_models(request: Request) -> JSONResponse:
         )
 
     payload_items: list[dict[str, Any]] = []
+    created_at = int(time.time())
     for model in models:
         row: dict[str, Any] = {
             "id": model.id,
             "object": "model",
-            "created": int(time.time()),
+            "created": created_at,
             "owned_by": model.provider or "puter",
         }
         if model.name:
