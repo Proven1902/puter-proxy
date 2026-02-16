@@ -61,7 +61,13 @@ class PuterClient:
                 message=f"Puter models request returned HTTP {response.status_code}",
             )
 
-        payload = response.json()
+        try:
+            payload = response.json()
+        except ValueError as exc:
+            raise PuterClientError(
+                code="upstream_error",
+                message="Puter models response was not valid JSON",
+            ) from exc
         raw_items = _extract_models_payload(payload)
         if not isinstance(raw_items, list):
             raise PuterClientError(code="upstream_error", message="Unexpected models payload from Puter")
@@ -136,7 +142,13 @@ class PuterClient:
                 message=f"Puter chat request returned HTTP {response.status_code}",
             )
 
-        data = response.json()
+        try:
+            data = response.json()
+        except ValueError as exc:
+            raise PuterClientError(
+                code="upstream_error",
+                message="Puter chat response was not valid JSON",
+            ) from exc
         if not isinstance(data, dict):
             raise PuterClientError(code="upstream_error", message="Unexpected chat payload from Puter")
         if data.get("success") is False:
@@ -147,6 +159,11 @@ class PuterClient:
 
         result = data.get("result")
         content = _extract_content(result)
+        if content is None or content.strip() == "":
+            raise PuterClientError(
+                code="upstream_error",
+                message="Unable to extract assistant content from Puter response",
+            )
         return {
             "id": str(data.get("id") or f"chatcmpl_{uuid.uuid4().hex}"),
             "model": model,
@@ -154,7 +171,7 @@ class PuterClient:
         }
 
 
-def _extract_content(result: Any) -> str:
+def _extract_content(result: Any) -> str | None:
     if isinstance(result, str):
         return result
     if isinstance(result, dict):
@@ -175,7 +192,7 @@ def _extract_content(result: Any) -> str:
             content = message.get("content")
             if isinstance(content, str):
                 return content
-    return ""
+    return None
 
 
 def _opt_str(value: Any) -> str | None:

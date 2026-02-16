@@ -4,14 +4,12 @@ from fastapi import FastAPI
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
-from proxy.app.config import CONFIG, validate_startup_guardrails
+from proxy.app.config import CONFIG
 from proxy.app.routes.chat_completions import router as chat_router
 from proxy.app.routes.healthz import router as health_router
 from proxy.app.routes.models import router as models_router
 from proxy.app.schemas.openai import error_body
 
-
-validate_startup_guardrails(CONFIG)
 
 app = FastAPI(title="puter-local-proxy", version="0.1.0")
 app.include_router(health_router)
