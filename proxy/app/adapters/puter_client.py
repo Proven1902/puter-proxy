@@ -7,6 +7,9 @@ from typing import Any
 import httpx
 
 
+_HTTP_CLIENT = httpx.Client()
+
+
 class PuterClientError(Exception):
     def __init__(self, *, code: str, message: str, details: dict[str, Any] | None = None) -> None:
         super().__init__(message)
@@ -46,8 +49,7 @@ class PuterClient:
 
         url = "https://api.puter.com/puterai/chat/models/details"
         try:
-            with httpx.Client(timeout=self._timeout) as client:
-                response = client.get(url, headers=self._headers())
+            response = _HTTP_CLIENT.get(url, headers=self._headers(), timeout=self._timeout)
         except httpx.TimeoutException as exc:
             raise PuterClientError(code="upstream_timeout", message="Puter models request timed out") from exc
         except httpx.HTTPError as exc:
@@ -119,8 +121,7 @@ class PuterClient:
         }
 
         try:
-            with httpx.Client(timeout=self._timeout) as client:
-                response = client.post(url, headers=self._headers(), json=payload)
+            response = _HTTP_CLIENT.post(url, headers=self._headers(), json=payload, timeout=self._timeout)
         except httpx.TimeoutException as exc:
             raise PuterClientError(code="upstream_timeout", message="Puter chat request timed out") from exc
         except httpx.HTTPError as exc:
@@ -147,6 +148,11 @@ class PuterClient:
 
         result = data.get("result")
         content = _extract_content(result)
+        if content is None or content.strip() == "":
+            raise PuterClientError(
+                code="upstream_error",
+                message="Unable to extract assistant content from Puter response",
+            )
         return {
             "id": str(data.get("id") or f"chatcmpl_{uuid.uuid4().hex}"),
             "model": model,
@@ -154,7 +160,7 @@ class PuterClient:
         }
 
 
-def _extract_content(result: Any) -> str:
+def _extract_content(result: Any) -> str | None:
     if isinstance(result, str):
         return result
     if isinstance(result, dict):
@@ -175,7 +181,7 @@ def _extract_content(result: Any) -> str:
             content = message.get("content")
             if isinstance(content, str):
                 return content
-    return ""
+    return None
 
 
 def _opt_str(value: Any) -> str | None:
