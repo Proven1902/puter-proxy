@@ -1,0 +1,4 @@
+
+> puter-desktop@0.1.0 lint
+> eslint --config renderer/eslint.config.mjs "renderer/src/**/*.{ts,tsx}"
+

@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "Overview",
+    "Proxy Control",
+    "Models",
+    "Logs",
+    "Settings"
+  ],
+  "data_testids": [
+    "app-shell",
+    "proxy-status",
+    "token-input",
+    "save-token",
+    "start-proxy",
+    "stop-proxy",
+    "restart-proxy",
+    "api-error",
+    "logs-panel"
+  ]
+}
