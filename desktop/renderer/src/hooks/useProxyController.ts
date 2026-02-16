@@ -40,7 +40,7 @@ function mapError(error: IpcErrorBody): UiBanner {
 }
 
 export function useProxyController() {
-  const [status, setStatus] = useState<ProxyStatusPayload>({ status: "stopped" });
+  const [status, setStatus] = useState<ProxyStatusPayload>({ status: "stopped", token_masked: false });
   const [logs, setLogs] = useState<IpcLogEntry[]>([]);
   const [banner, setBanner] = useState<UiBanner | null>(null);
   const [busy, setBusy] = useState(false);
@@ -66,6 +66,7 @@ export function useProxyController() {
       return;
     }
     setStatus(response.data);
+    setTokenMasked(Boolean(response.data.token_masked));
   }, []);
 
   const refreshLogs = useCallback(async () => {
@@ -146,6 +147,7 @@ export function useProxyController() {
       }
 
       setTokenMasked(true);
+      setStatus((previous) => ({ ...previous, token_masked: true }));
       setTokenSavedToast(true);
       setBanner(null);
       if (toastTimerRef.current !== undefined) {
@@ -172,6 +174,7 @@ export function useProxyController() {
       }
 
       setTokenMasked(false);
+      setStatus((previous) => ({ ...previous, token_masked: false }));
       setBanner(null);
       return true;
     } finally {
