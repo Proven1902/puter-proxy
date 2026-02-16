@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { App } from "../App";
 
@@ -17,6 +17,8 @@ const mockApi = {
 
 describe("Task 4 renderer smoke", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
+
     mockApi.proxyStatus.mockResolvedValue({
       ok: true,
       request_id: "req_status",
@@ -33,6 +35,10 @@ describe("Task 4 renderer smoke", () => {
     mockApi.tokenSave.mockResolvedValue({ ok: true, request_id: "req_save", data: { saved: true } });
     mockApi.tokenClear.mockResolvedValue({ ok: true, request_id: "req_clear", data: { cleared: true } });
     window.puterDesktopApi = mockApi;
+  });
+
+  afterEach(() => {
+    Reflect.deleteProperty(window, "puterDesktopApi");
   });
 
   it("renders required navigation and test ids", async () => {

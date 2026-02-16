@@ -47,8 +47,19 @@ export function useProxyController() {
   const [tokenMasked, setTokenMasked] = useState(false);
   const [tokenSavedToast, setTokenSavedToast] = useState(false);
   const lastCursorRef = useRef<string | undefined>(undefined);
+  const busyRef = useRef(false);
+  const toastTimerRef = useRef<number | undefined>(undefined);
+
+  const setBusyState = useCallback((value: boolean) => {
+    busyRef.current = value;
+    setBusy(value);
+  }, []);
 
   const refreshStatus = useCallback(async () => {
+    if (busyRef.current) {
+      return;
+    }
+
     const response = await desktopIpcClient.proxyStatus();
     if (!response.ok) {
       setBanner(mapError(response.error));
@@ -83,6 +94,15 @@ export function useProxyController() {
   }, []);
 
   useEffect(() => {
+    return () => {
+      if (toastTimerRef.current !== undefined) {
+        window.clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = undefined;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     refreshStatus().catch(handlePollingError);
     refreshLogs().catch(handlePollingError);
 
@@ -95,7 +115,7 @@ export function useProxyController() {
   }, [handlePollingError, refreshLogs, refreshStatus]);
 
   const invokeLifecycle = useCallback(async (action: "start" | "stop" | "restart") => {
-    setBusy(true);
+    setBusyState(true);
     try {
       const response =
         action === "start"
@@ -112,12 +132,12 @@ export function useProxyController() {
       setStatus(response.data);
       setBanner(null);
     } finally {
-      setBusy(false);
+      setBusyState(false);
     }
-  }, []);
+  }, [setBusyState]);
 
   const saveToken = useCallback(async (token: string) => {
-    setBusy(true);
+    setBusyState(true);
     try {
       const response = await desktopIpcClient.tokenSave(token);
       if (!response.ok) {
@@ -128,15 +148,22 @@ export function useProxyController() {
       setTokenMasked(true);
       setTokenSavedToast(true);
       setBanner(null);
-      window.setTimeout(() => setTokenSavedToast(false), 2000);
+      if (toastTimerRef.current !== undefined) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+
+      toastTimerRef.current = window.setTimeout(() => {
+        setTokenSavedToast(false);
+        toastTimerRef.current = undefined;
+      }, 2000);
       return true;
     } finally {
-      setBusy(false);
+      setBusyState(false);
     }
-  }, []);
+  }, [setBusyState]);
 
   const clearToken = useCallback(async () => {
-    setBusy(true);
+    setBusyState(true);
     try {
       const response = await desktopIpcClient.tokenClear();
       if (!response.ok) {
@@ -148,9 +175,9 @@ export function useProxyController() {
       setBanner(null);
       return true;
     } finally {
-      setBusy(false);
+      setBusyState(false);
     }
-  }, []);
+  }, [setBusyState]);
 
   const streamUnsupportedBanner = useMemo<UiBanner>(
     () => ({
