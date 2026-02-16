@@ -7,7 +7,6 @@
   "scripts": {
     "task3:smoke": "node scripts/task3-smoke.mjs",
     "task4:smoke": "vitest run --config renderer/vitest.config.ts renderer/src/__tests__/task4.smoke.test.tsx",
-    "task5:smoke": "node scripts/task5-smoke.mjs",
     "dev": "vite --config renderer/vite.config.ts",
     "build": "vite build --config renderer/vite.config.ts",
     "lint": "eslint --config renderer/eslint.config.mjs \"renderer/src/**/*.{ts,tsx}\"",

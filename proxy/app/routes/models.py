@@ -7,9 +7,9 @@ from typing import Any
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
-from proxy.app.adapters.puter_client import PuterClientError
+from proxy.app.adapters.puter_client import PuterClient, PuterClientError
+from proxy.app.config import CONFIG
 from proxy.app.schemas.openai import error_body, models_response
-from proxy.app.services.auth import build_puter_client
 
 router = APIRouter(tags=["models"])
 
@@ -17,7 +17,7 @@ router = APIRouter(tags=["models"])
 @router.get("/v1/models")
 def get_models(request: Request) -> JSONResponse:
     request_id = request.headers.get("x-request-id") or f"req_{uuid.uuid4().hex}"
-    client = build_puter_client()
+    client = PuterClient(token=CONFIG.puter_token)
 
     try:
         models = client.list_models()

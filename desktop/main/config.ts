@@ -55,22 +55,13 @@ function parseBoolean(raw: string | undefined, fallback: boolean): boolean {
   return TRUE_VALUES.has(raw.trim().toLowerCase());
 }
 
-function parsePuterToken(env: Record<string, string | undefined>): string {
-  const nodeEnv = env.NODE_ENV?.trim().toLowerCase();
-  if (nodeEnv === "production") {
-    return "";
-  }
-
-  return env.PUTER_TOKEN?.trim() || "";
-}
-
 export function loadDesktopRuntimeConfig(
   env: Record<string, string | undefined> = process.env,
 ): DesktopRuntimeConfig {
   return {
     host: parseHost(env.HOST),
     port: parsePort(env.PORT),
-    puterToken: parsePuterToken(env),
+    puterToken: env.PUTER_TOKEN?.trim() || "",
     logLevel: parseLogLevel(env.LOG_LEVEL),
     proxyFeatureEnabled: parseBoolean(env.PROXY_FEATURE_ENABLED, true),
   };
