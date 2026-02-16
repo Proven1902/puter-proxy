@@ -1,0 +1,1 @@
+Rapid sequence validated in task4 smoke: start -> restart -> stop with deterministic state assertions and no stale status regressions.
