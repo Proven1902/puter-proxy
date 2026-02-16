@@ -1,0 +1,13 @@
+{
+  "invalid_request": true,
+  "unauthorized": true,
+  "token_missing": true,
+  "model_not_found": true,
+  "streaming_not_supported": true,
+  "upstream_timeout": true,
+  "upstream_error": true,
+  "proxy_unavailable": true,
+  "port_in_use": true,
+  "python_runtime_missing": true,
+  "internal_error": true
+}
