@@ -1,6 +1,6 @@
 {
   "plan": ".sisyphus/plans/puter-electron-openai-proxy.md",
-  "task": "Task 1-6",
+  "task": "Task 1-7",
   "artifacts": [
     {
       "path": ".sisyphus/evidence/task-1-dev-startup.txt",
@@ -133,6 +133,14 @@
     {
       "path": ".sisyphus/evidence/task-6-structured-logs.txt",
       "description": "Task 6 metadata-only structured log sample"
+    },
+    {
+      "path": ".sisyphus/evidence/task-7-tests.txt",
+      "description": "Task 7 full automated suite summary (proxy+ui+integration)"
+    },
+    {
+      "path": ".sisyphus/evidence/task-7-stream-test.txt",
+      "description": "Task 7 targeted stream=true rejection regression evidence"
     }
   ]
 }
