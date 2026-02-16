@@ -4,6 +4,7 @@ import uuid
 from typing import Any
 
 from fastapi import APIRouter, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
 from proxy.app.adapters.puter_client import PuterClient, PuterClientError
@@ -83,7 +84,7 @@ async def create_chat_completion(request: Request) -> JSONResponse:
     temperature_raw = payload.get("temperature")
     temperature: float | None = None
     if temperature_raw is not None:
-        if not isinstance(temperature_raw, (int, float)):
+        if not isinstance(temperature_raw, (int, float)) or isinstance(temperature_raw, bool):
             return JSONResponse(
                 status_code=400,
                 content=error_body(
@@ -97,7 +98,7 @@ async def create_chat_completion(request: Request) -> JSONResponse:
     max_tokens_raw = payload.get("max_tokens")
     max_tokens: int | None = None
     if max_tokens_raw is not None:
-        if not isinstance(max_tokens_raw, int) or max_tokens_raw < 1:
+        if not isinstance(max_tokens_raw, int) or isinstance(max_tokens_raw, bool) or max_tokens_raw < 1:
             return JSONResponse(
                 status_code=400,
                 content=error_body(
@@ -162,7 +163,8 @@ async def create_chat_completion(request: Request) -> JSONResponse:
     client = PuterClient(token=CONFIG.puter_token)
 
     try:
-        result = client.chat_completion(
+        result = await run_in_threadpool(
+            client.chat_completion,
             model=model.strip(),
             messages=normalized_messages,
             temperature=temperature,
