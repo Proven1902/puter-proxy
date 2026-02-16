@@ -186,9 +186,9 @@ export class ProxyManager {
 
   public async stop(): Promise<ProxyStatusPayload> {
     this.stopRequested = true;
-    if (this.process) {
-      const proc = this.process;
-      this.process = null;
+    const proc = this.process;
+    this.process = null;
+    if (proc) {
       proc.kill();
     }
 
