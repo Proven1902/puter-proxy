@@ -26,14 +26,33 @@ export interface IpcRequestMap {
   "logs.subscribe": { cursor?: string };
 }
 
+export type ProxyLifecycleState = "stopped" | "starting" | "running" | "error";
+
+export interface ProxyStatusPayload {
+  status: ProxyLifecycleState;
+  pid?: number;
+  retries_in_window?: number;
+  last_transition_at?: string;
+  error_code?: string;
+  error_message?: string;
+}
+
+export interface IpcLogEntry {
+  ts: string;
+  level: "INFO" | "WARN" | "ERROR";
+  event: string;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
 export interface IpcResponseMap {
-  "proxy.start": { status: "starting" | "running" };
-  "proxy.stop": { status: "stopped" };
-  "proxy.restart": { status: "starting" | "running" };
-  "proxy.status": { status: "stopped" | "starting" | "running" | "error" };
+  "proxy.start": ProxyStatusPayload;
+  "proxy.stop": ProxyStatusPayload;
+  "proxy.restart": ProxyStatusPayload;
+  "proxy.status": ProxyStatusPayload;
   "token.save": { saved: true };
   "token.clear": { cleared: true };
-  "logs.subscribe": { subscribed: true; channel: "logs" };
+  "logs.subscribe": { subscribed: true; channel: "logs"; entries: IpcLogEntry[] };
 }
 
 export interface IpcErrorBody {
