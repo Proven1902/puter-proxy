@@ -107,7 +107,33 @@ async function main() {
   compileDesktopMainTs();
 
   const mainIndexPath = pathToFileURL(resolve(tmpOutDir, "index.js")).href;
-  const { dispatchIpcCommand } = await import(mainIndexPath);
+  const proxyManagerPath = pathToFileURL(resolve(tmpOutDir, "proxy-manager.js")).href;
+
+  const { dispatchIpcCommand, getTokenState } = await import(mainIndexPath);
+  const proxyManagerModule = await import(proxyManagerPath);
+
+  const stateView = getTokenState();
+  assert(typeof stateView.masked === "boolean", "getTokenState should expose masked flag");
+  assert(!("value" in stateView), "getTokenState must not expose plaintext token value");
+
+  const originalStatus = proxyManagerModule.proxyManager.status.bind(proxyManagerModule.proxyManager);
+  const originalRestart = proxyManagerModule.proxyManager.restart.bind(proxyManagerModule.proxyManager);
+  let restartCalls = 0;
+
+  proxyManagerModule.proxyManager.status = () => ({ status: "running" });
+  proxyManagerModule.proxyManager.restart = async () => {
+    restartCalls += 1;
+    return { status: "running" };
+  };
+
+  const restartOnSaveResponse = await dispatchIpcCommand("token.save", {
+    token: "pt_Task5RestartToken_Probe",
+  });
+  assert(restartOnSaveResponse && restartOnSaveResponse.ok === true, "token.save should succeed for restart probe");
+  assert(restartCalls === 1, "token.save must restart running proxy to apply updated token");
+
+  proxyManagerModule.proxyManager.status = originalStatus;
+  proxyManagerModule.proxyManager.restart = originalRestart;
 
   const token = "pt_Task5SmokeToken_ABC123";
 

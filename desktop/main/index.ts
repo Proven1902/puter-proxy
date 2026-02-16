@@ -22,6 +22,10 @@ interface TokenState {
   masked: boolean;
 }
 
+interface PublicTokenState {
+  masked: boolean;
+}
+
 const tokenState: TokenState = {
   value: "",
   masked: false,
@@ -38,6 +42,13 @@ function applyTokenToRuntime(token: string): void {
   }
 
   proxyManager.clearPuterToken();
+}
+
+async function restartProxyIfRunning(): Promise<void> {
+  const status = proxyManager.status();
+  if (status.status === "running" || status.status === "starting") {
+    await proxyManager.restart();
+  }
 }
 
 function initializeTokenState(): void {
@@ -178,12 +189,14 @@ async function handleProxyChannel(channel: IpcChannel, payload: unknown): Promis
       const token = extractToken(payload);
       tokenStore.saveToken(token);
       applyTokenToRuntime(token);
+      await restartProxyIfRunning();
       return okResponse<IpcResponseMap["token.save"]>({ saved: true });
     }
 
     if (channel === IPC_CHANNELS.TOKEN_CLEAR) {
       tokenStore.clearToken();
       applyTokenToRuntime("");
+      await restartProxyIfRunning();
       return okResponse<IpcResponseMap["token.clear"]>({ cleared: true });
     }
 
@@ -227,9 +240,8 @@ export function registerIpcHandlers(ipcMain: IpcMainLike): void {
   }
 }
 
-export function getTokenState(): TokenState {
+export function getTokenState(): PublicTokenState {
   return {
-    value: tokenState.value,
     masked: tokenState.masked,
   };
 }
