@@ -1,6 +1,6 @@
 {
   "plan": ".sisyphus/plans/puter-electron-openai-proxy.md",
-  "task": "Task 1",
+  "task": "Task 1-2",
   "artifacts": [
     {
       "path": ".sisyphus/evidence/task-1-dev-startup.txt",
@@ -17,6 +17,50 @@
     {
       "path": ".sisyphus/evidence/task-1-ipc-check.txt",
       "description": "IPC allowlist channel check"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-health.json",
+      "description": "Task 2 health contract response"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-models.json",
+      "description": "Task 2 models contract response (token_missing until token configured)"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-chat-nonstream.json",
+      "description": "Task 2 non-stream chat contract response (token_missing until token configured)"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-stream-reject.json",
+      "description": "Task 2 stream=true explicit 501 rejection contract"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-unsupported-route.json",
+      "description": "Task 2 unsupported /v1/embeddings structured 404 response"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-unknown-route.json",
+      "description": "Task 2 unknown /v1/* structured 404 response"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-contract-check.json",
+      "description": "Task 2 endpoint status/code contract summary"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-models-with-token.json",
+      "description": "Task 2 /v1/models response with valid local token"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-chat-nonstream-with-token.json",
+      "description": "Task 2 /v1/chat/completions non-stream response with valid local token"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-stream-reject-with-token.json",
+      "description": "Task 2 stream=true rejection remains enforced with token present"
+    },
+    {
+      "path": ".sisyphus/evidence/task-2-contract-check-with-token.json",
+      "description": "Task 2 status/code contract summary with valid local token"
     }
   ]
 }
