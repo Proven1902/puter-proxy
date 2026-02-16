@@ -7,9 +7,9 @@ from fastapi import APIRouter, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
-from proxy.app.adapters.puter_client import PuterClient, PuterClientError
-from proxy.app.config import CONFIG
+from proxy.app.adapters.puter_client import PuterClientError
 from proxy.app.schemas.openai import chat_completion_response, error_body
+from proxy.app.services.auth import build_puter_client
 
 router = APIRouter(tags=["chat"])
 
@@ -160,7 +160,7 @@ async def create_chat_completion(request: Request) -> JSONResponse:
 
         normalized_messages.append({"role": role, "content": content})
 
-    client = PuterClient(token=CONFIG.puter_token)
+    client = build_puter_client()
 
     try:
         result = await run_in_threadpool(
