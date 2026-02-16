@@ -61,7 +61,13 @@ class PuterClient:
                 message=f"Puter models request returned HTTP {response.status_code}",
             )
 
-        payload = response.json()
+        try:
+            payload = response.json()
+        except ValueError as exc:
+            raise PuterClientError(
+                code="upstream_error",
+                message="Puter models response was not valid JSON",
+            ) from exc
         raw_items = _extract_models_payload(payload)
         if not isinstance(raw_items, list):
             raise PuterClientError(code="upstream_error", message="Unexpected models payload from Puter")
@@ -136,7 +142,13 @@ class PuterClient:
                 message=f"Puter chat request returned HTTP {response.status_code}",
             )
 
-        data = response.json()
+        try:
+            data = response.json()
+        except ValueError as exc:
+            raise PuterClientError(
+                code="upstream_error",
+                message="Puter chat response was not valid JSON",
+            ) from exc
         if not isinstance(data, dict):
             raise PuterClientError(code="upstream_error", message="Unexpected chat payload from Puter")
         if data.get("success") is False:
