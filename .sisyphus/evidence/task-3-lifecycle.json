@@ -1,0 +1,25 @@
+{
+  "start": {
+    "status": "running",
+    "pid": 2872,
+    "retries_in_window": 0,
+    "last_transition_at": "2026-02-16T08:53:58.406Z"
+  },
+  "statusAfterStart": {
+    "status": "running",
+    "pid": 2872,
+    "retries_in_window": 0,
+    "last_transition_at": "2026-02-16T08:53:58.406Z"
+  },
+  "restart": {
+    "status": "running",
+    "pid": 6856,
+    "retries_in_window": 0,
+    "last_transition_at": "2026-02-16T08:53:59.341Z"
+  },
+  "stop": {
+    "status": "stopped",
+    "retries_in_window": 0,
+    "last_transition_at": "2026-02-16T08:53:59.596Z"
+  }
+}

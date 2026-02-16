@@ -1,6 +1,6 @@
 {
   "plan": ".sisyphus/plans/puter-electron-openai-proxy.md",
-  "task": "Task 1-2",
+  "task": "Task 1-3",
   "artifacts": [
     {
       "path": ".sisyphus/evidence/task-1-dev-startup.txt",
@@ -61,6 +61,30 @@
     {
       "path": ".sisyphus/evidence/task-2-contract-check-with-token.json",
       "description": "Task 2 status/code contract summary with valid local token"
+    },
+    {
+      "path": ".sisyphus/evidence/task-3-manager-smoke.txt",
+      "description": "Task 3 proxy manager smoke execution output"
+    },
+    {
+      "path": ".sisyphus/evidence/task-3-smoke-summary.json",
+      "description": "Task 3 deterministic smoke summary for lifecycle and error-code checks"
+    },
+    {
+      "path": ".sisyphus/evidence/task-3-lifecycle.json",
+      "description": "Task 3 start/stop/restart/status IPC lifecycle evidence"
+    },
+    {
+      "path": ".sisyphus/evidence/task-3-port-in-use.json",
+      "description": "Task 3 deterministic port collision error code evidence"
+    },
+    {
+      "path": ".sisyphus/evidence/task-3-python-missing.json",
+      "description": "Task 3 deterministic missing Python runtime error code evidence"
+    },
+    {
+      "path": ".sisyphus/evidence/task-3-retry-failure.txt",
+      "description": "Task 3 bounded restart budget failure evidence"
     }
   ]
 }

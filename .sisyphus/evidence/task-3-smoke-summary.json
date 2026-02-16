@@ -1,0 +1,10 @@
+{
+  "task3_smoke_ok": true,
+  "checks": [
+    "start_stop_restart_status",
+    "allowlist/status",
+    "port_in_use",
+    "python_runtime_missing",
+    "crash_loop_budget"
+  ]
+}
