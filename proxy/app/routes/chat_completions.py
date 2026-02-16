@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import uuid
 from typing import Any
 
 from fastapi import APIRouter, Request
@@ -8,6 +7,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse
 
 from proxy.app.adapters.puter_client import PuterClientError
+from proxy.app.request_context import get_request_id
 from proxy.app.schemas.openai import chat_completion_response, error_body
 from proxy.app.services.auth import build_puter_client
 
@@ -16,7 +16,7 @@ router = APIRouter(tags=["chat"])
 
 @router.post("/v1/chat/completions")
 async def create_chat_completion(request: Request) -> JSONResponse:
-    request_id = request.headers.get("x-request-id") or f"req_{uuid.uuid4().hex}"
+    request_id = get_request_id(request)
     try:
         payload = await request.json()
     except Exception:
@@ -80,6 +80,9 @@ async def create_chat_completion(request: Request) -> JSONResponse:
                 request_id=request_id,
             ),
         )
+
+    model_name = model.strip()
+    request.state.model = model_name
 
     temperature_raw = payload.get("temperature")
     temperature: float | None = None
@@ -165,7 +168,7 @@ async def create_chat_completion(request: Request) -> JSONResponse:
     try:
         result = await run_in_threadpool(
             client.chat_completion,
-            model=model.strip(),
+            model=model_name,
             messages=normalized_messages,
             temperature=temperature,
             max_tokens=max_tokens,
@@ -176,6 +179,8 @@ async def create_chat_completion(request: Request) -> JSONResponse:
             status_code = 401
         elif exc.code == "model_not_found":
             status_code = 404
+        elif exc.code == "upstream_timeout":
+            status_code = 504
         else:
             status_code = 502
         return JSONResponse(
