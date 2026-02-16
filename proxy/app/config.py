@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 
 ALLOWED_LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
-LOCALHOST_ALLOWED = {"127.0.0.1", "localhost"}
+LOCALHOST_ALLOWED = {"127.0.0.1"}
 
 
 def _parse_bool(raw: str | None, *, default: bool) -> bool:
@@ -32,7 +32,7 @@ def _parse_host(raw: str | None) -> str:
     if host not in LOCALHOST_ALLOWED:
         raise ValueError(
             f"Invalid HOST value for localhost-only MVP: {host}. "
-            "Allowed: 127.0.0.1, localhost"
+            "Allowed: 127.0.0.1"
         )
     return host
 
@@ -75,7 +75,7 @@ def load_config(env: dict[str, str] | None = None) -> ProxyConfig:
 
 
 def validate_startup_guardrails(config: ProxyConfig) -> None:
-    if config.host not in LOCALHOST_ALLOWED:
+    if config.host != "127.0.0.1":
         raise RuntimeError(
             f"MVP startup blocked: HOST must be localhost-only, got {config.host!r}"
         )
