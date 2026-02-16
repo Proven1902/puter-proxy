@@ -25,27 +25,18 @@ app.include_router(chat_router)
 
 @app.middleware("http")
 async def request_context_and_logging(request: Request, call_next):
-    request.state.request_id = get_request_id(request)
-    started = time.perf_counter()
     request_id = get_request_id(request)
-    status_code = 500
+    request.state.request_id = request_id
+    started = time.perf_counter()
+    log_extra = None
 
     try:
         response = await call_next(request)
-        status_code = response.status_code
-    except Exception:
-        latency_ms = int((time.perf_counter() - started) * 1000)
-        model = getattr(request.state, "model", None)
-        emit_request_log(
-            route=request.url.path,
-            status=status_code,
-            latency_ms=latency_ms,
-            model=model if isinstance(model, str) else None,
-            request_id=request_id,
-            extra={"code": "internal_error"},
-        )
-        raise
+    except Exception as exc:
+        response = await handle_internal_error(request, exc)
+        log_extra = {"code": "internal_error"}
 
+    status_code = response.status_code
     latency_ms = int((time.perf_counter() - started) * 1000)
     response.headers["x-request-id"] = request_id
 
@@ -56,6 +47,7 @@ async def request_context_and_logging(request: Request, call_next):
         latency_ms=latency_ms,
         model=model if isinstance(model, str) else None,
         request_id=request_id,
+        extra=log_extra,
     )
 
     return response
