@@ -16,7 +16,6 @@
     "main/config.ts",
     "main/ipc.ts",
     "main/security-store.ts",
-    "main/safe-storage-helper.ts",
     "main/proxy-manager.ts",
     "main/index.ts",
     "main/runtime.ts",
