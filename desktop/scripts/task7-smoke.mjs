@@ -37,6 +37,35 @@ function run(command, args, env = process.env) {
   return child.stdout.trim();
 }
 
+function withEnv(overrides) {
+  return {
+    ...process.env,
+    ...overrides,
+  };
+}
+
+function applyScopedEnv(overrides) {
+  const previous = {};
+  for (const [key, value] of Object.entries(overrides)) {
+    previous[key] = process.env[key];
+    if (value === undefined || value === null) {
+      delete process.env[key];
+    } else {
+      process.env[key] = String(value);
+    }
+  }
+
+  return () => {
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  };
+}
+
 function runNpm(args) {
   const npmExecPath = process.env.npm_execpath;
   if (!npmExecPath) {
@@ -94,7 +123,13 @@ async function runProxyTests() {
     "print('proxy_tests_ok=true')",
   ].join("; ");
 
-  run("python", ["-c", code]);
+  run("python", ["-c", code], withEnv({
+      PUTER_TOKEN: "pt_task7_token",
+      HOST: "127.0.0.1",
+      PORT: "11435",
+      LOG_LEVEL: "INFO",
+      PROXY_FEATURE_ENABLED: "1",
+    }));
 }
 
 async function runUiTests() {
@@ -102,22 +137,24 @@ async function runUiTests() {
 }
 
 async function runIntegrationAndContracts() {
-  process.env.NODE_ENV = "production";
-  process.env.PUTER_TOKEN = "";
-  process.env.PUTER_DESKTOP_SECURE_STORE_PATH = secureStorePath;
-
-  compileDesktopMainTs();
-
-  const mainIndexPath = pathToFileURL(resolve(tmpOutDir, "index.js")).href;
-  const { dispatchIpcCommand } = await import(mainIndexPath);
-
-  const clear = await dispatchIpcCommand("token.clear", {});
-  assert(clear && clear.ok === true, "token.clear must succeed before integration test");
-
-  const start = await dispatchIpcCommand("proxy.start", {});
-  assert(start && start.ok === true, "proxy.start must succeed for integration test");
+  const restoreEnv = applyScopedEnv({
+    NODE_ENV: "production",
+    PUTER_TOKEN: "",
+    PUTER_DESKTOP_SECURE_STORE_PATH: secureStorePath,
+  });
 
   try {
+    compileDesktopMainTs();
+
+    const mainIndexPath = pathToFileURL(resolve(tmpOutDir, "index.js")).href;
+    const { dispatchIpcCommand } = await import(mainIndexPath);
+
+    const clear = await dispatchIpcCommand("token.clear", {});
+    assert(clear && clear.ok === true, "token.clear must succeed before integration test");
+
+    const start = await dispatchIpcCommand("proxy.start", {});
+    assert(start && start.ok === true, "proxy.start must succeed for integration test");
+
     let running = false;
     for (let i = 0; i < 50; i += 1) {
       const status = await dispatchIpcCommand("proxy.status", {});
@@ -186,9 +223,11 @@ async function runIntegrationAndContracts() {
       `${JSON.stringify({ status: streamReject.status, code: streamBody?.error?.code || null }, null, 2)}\n`,
       "utf-8",
     );
-  } finally {
+
     const stop = await dispatchIpcCommand("proxy.stop", {});
     assert(stop && stop.ok === true, "proxy.stop must succeed after integration validation");
+  } finally {
+    restoreEnv();
   }
 }
 
