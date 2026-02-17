@@ -322,8 +322,8 @@ proxy/tests/                    # Task 7 owner (pytest)
 
   **Acceptance Criteria**:
   - [ ] `CONFIG.md` exists and defines `HOST`, `PORT`, `PUTER_TOKEN`, `LOG_LEVEL`, `PROXY_FEATURE_ENABLED` (verified by: `python -c "from pathlib import Path; t=Path('CONFIG.md').read_text(encoding='utf-8'); keys=['HOST','PORT','PUTER_TOKEN','LOG_LEVEL','PROXY_FEATURE_ENABLED']; print('ok' if all(k in t for k in keys) else 'missing_keys')"` → `ok`).
-  - [ ] File/module map from "File & Module Ownership Map" exists on disk (verified by: `python -c "from pathlib import Path; req=['desktop/main/config.ts','desktop/main/ipc.ts','desktop/preload/api.ts','proxy/app/main.py','proxy/app/config.py']; missing=[p for p in req if not Path(p).exists()]; print('ok' if not missing else missing)"` → `ok`).
-  - [ ] IPC allowlist channels are declared in one canonical module and consumed by preload/main (verified by: `python -c "from pathlib import Path; t=Path('desktop/main/ipc.ts').read_text(encoding='utf-8'); ch=['proxy.start','proxy.stop','proxy.restart','proxy.status','token.save','token.clear','logs.subscribe']; print('ok' if all(c in t for c in ch) else 'missing_channels')"` → `ok`).
+  - [x] File/module map from "File & Module Ownership Map" exists on disk (verified by: `python -c "from pathlib import Path; req=['desktop/main/config.ts','desktop/main/ipc.ts','desktop/preload/api.ts','proxy/app/main.py','proxy/app/config.py']; missing=[p for p in req if not Path(p).exists()]; print('ok' if not missing else missing)"` → `ok`). Evidence: .sisyphus/evidence/task-1-filemap-check.txt
+  - [x] IPC allowlist channels are declared in one canonical module and consumed by preload/main (verified by: `python -c "from pathlib import Path; t=Path('desktop/main/ipc.ts').read_text(encoding='utf-8'); ch=['proxy.start','proxy.stop','proxy.restart','proxy.status','token.save','token.clear','logs.subscribe']; print('ok' if all(c in t for c in ch) else 'missing_channels')"` → `ok`).
   - [ ] `npm --prefix desktop run smoke:dev` exists and exits `0` without interactive prompts.
 
   **Agent-Executed QA Scenarios**:
