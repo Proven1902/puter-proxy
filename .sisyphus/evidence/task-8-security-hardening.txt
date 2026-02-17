@@ -1,6 +1,8 @@
 {
   "secure_store_path": "C:\\Users\\admin\\Desktop\\projects\\puterapp\\desktop\\.tmp-task8\\secure-store.json",
   "secure_store_sentinel_present": true,
+  "safe_storage_helper_packaged": true,
+  "safe_storage_helper_path": "C:\\Users\\admin\\Desktop\\projects\\puterapp\\desktop\\dist\\win-unpacked\\resources\\safe-storage-helper.js",
   "token_service_override": "puter-desktop-task8-smoke",
   "token_account_override": "puter-token-task8-smoke",
   "token_field_exposed": false,

@@ -144,29 +144,11 @@ function helperScriptPath(): string {
     return resolve(override);
   }
 
-  const resourcesPath = process.resourcesPath?.trim();
-  const execDir = process.execPath ? dirname(process.execPath) : "";
-  const candidates = [
-    resolve(__dirname, SAFE_STORAGE_HELPER_SCRIPT),
-    resolve(__dirname, "main", SAFE_STORAGE_HELPER_SCRIPT),
-    resolve(__dirname, "..", "main", SAFE_STORAGE_HELPER_SCRIPT),
-    ...(resourcesPath
-      ? [
-          resolve(resourcesPath, "app.asar.unpacked", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
-          resolve(resourcesPath, "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
-          resolve(resourcesPath, "app", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
-        ]
-      : []),
-    ...(execDir
-      ? [
-          resolve(execDir, "resources", "app.asar.unpacked", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
-          resolve(execDir, "resources", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
-          resolve(execDir, "resources", "app", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
-        ]
-      : []),
-  ];
-
-  const uniqueCandidates = Array.from(new Set(candidates));
+  const packagedCandidate = process.resourcesPath?.trim()
+    ? resolve(process.resourcesPath, SAFE_STORAGE_HELPER_SCRIPT)
+    : "";
+  const localCandidate = resolve(__dirname, SAFE_STORAGE_HELPER_SCRIPT);
+  const uniqueCandidates = Array.from(new Set([packagedCandidate, localCandidate].filter((candidate) => candidate !== "")));
 
   for (const candidate of uniqueCandidates) {
     if (existsSync(candidate)) {

@@ -2,6 +2,9 @@ appId: com.puter.desktop
 productName: Puter Desktop
 directories:
   output: dist
+extraResources:
+  - from: .build/main/main/safe-storage-helper.js
+    to: safe-storage-helper.js
 files:
   - from: .
     filter:
