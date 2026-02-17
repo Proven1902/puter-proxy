@@ -400,7 +400,7 @@ proxy/tests/                    # Task 7 owner (pytest)
       3. Assert response.choices[0].message.content is non-empty string
       4. Save response body
     Expected Result: Valid OpenAI-compatible completion payload
-    Evidence: .sisyphus/evidence/task-2-chat-success.json
+    Evidence: .sisyphus/evidence/task-2-chat-nonstream-with-token.json
 
   Scenario: Health and models contracts
     Tool: Bash (curl)
