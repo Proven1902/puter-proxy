@@ -21,6 +21,7 @@ export interface TokenSecureStore {
 
 const TOKEN_SERVICE_FALLBACK = "puter-desktop";
 const TOKEN_ACCOUNT_FALLBACK = "puter-token";
+const LEGACY_KEYTAR_MODULE_NAME = "keytar";
 const LEGACY_KEYCHAIN_SENTINEL = "KEYCHAIN_BACKED";
 const SAFE_STORAGE_SENTINEL = "SAFE_STORAGE_BACKED";
 const SAFE_STORAGE_HELPER_SCRIPT = "safe-storage-helper.js";
@@ -138,9 +139,24 @@ function resolveElectronBinaryPath(): string {
 }
 
 function helperScriptPath(): string {
+  const override = process.env.PUTER_DESKTOP_SAFE_STORAGE_HELPER_PATH?.trim();
+  if (override) {
+    return resolve(override);
+  }
+
+  const resourcesPath = process.resourcesPath?.trim();
   const candidates = [
     resolve(__dirname, SAFE_STORAGE_HELPER_SCRIPT),
     resolve(__dirname, "main", SAFE_STORAGE_HELPER_SCRIPT),
+    ...(resourcesPath
+      ? [
+          resolve(resourcesPath, "app.asar.unpacked", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+          resolve(resourcesPath, "app.asar", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+          resolve(resourcesPath, "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+        ]
+      : []),
+    resolve(dirname(process.execPath), "resources", "app.asar.unpacked", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+    resolve(dirname(process.execPath), "resources", "app.asar", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
   ];
 
   for (const candidate of candidates) {
@@ -220,7 +236,7 @@ async function loadLegacyKeytarModule(): Promise<LegacyKeytarLike | null> {
     };
   }
 
-  const legacyModuleName = ["key", "tar"].join("");
+  const legacyModuleName = LEGACY_KEYTAR_MODULE_NAME;
   try {
     const imported = require(legacyModuleName) as {
       default?: LegacyKeytarLike;
