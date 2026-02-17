@@ -1,0 +1,4 @@
+{
+  "status": 501,
+  "code": "streaming_not_supported"
+}
