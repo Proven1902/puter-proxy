@@ -143,11 +143,13 @@ async function runIntegrationAndContracts() {
     PUTER_DESKTOP_SECURE_STORE_PATH: secureStorePath,
   });
 
+  let dispatchIpcCommand;
+
   try {
     compileDesktopMainTs();
 
     const mainIndexPath = pathToFileURL(resolve(tmpOutDir, "index.js")).href;
-    const { dispatchIpcCommand } = await import(mainIndexPath);
+    ({ dispatchIpcCommand } = await import(mainIndexPath));
 
     const clear = await dispatchIpcCommand("token.clear", {});
     assert(clear && clear.ok === true, "token.clear must succeed before integration test");
@@ -224,9 +226,11 @@ async function runIntegrationAndContracts() {
       "utf-8",
     );
 
-    const stop = await dispatchIpcCommand("proxy.stop", {});
-    assert(stop && stop.ok === true, "proxy.stop must succeed after integration validation");
   } finally {
+    if (typeof dispatchIpcCommand === "function") {
+      const stop = await dispatchIpcCommand("proxy.stop", {});
+      assert(stop && stop.ok === true, "proxy.stop must succeed after integration validation");
+    }
     restoreEnv();
   }
 }
