@@ -42,25 +42,7 @@ function run(command, args, options = {}) {
 
 function compileDesktopMainTs() {
   const tscEntrypoint = resolve(desktopRoot, "node_modules", "typescript", "bin", "tsc");
-  const args = [
-    "--target",
-    "ES2022",
-    "--module",
-    "commonjs",
-    "--moduleResolution",
-    "node",
-    "--lib",
-    "ES2022,DOM",
-    "--types",
-    "node",
-    "--outDir",
-    ".tmp-task8",
-    "main/config.ts",
-    "main/ipc.ts",
-    "main/security-store.ts",
-    "main/proxy-manager.ts",
-    "main/index.ts",
-  ];
+  const args = ["-p", "tsconfig.main.json", "--outDir", ".tmp-task8"];
 
   const compile = run(process.execPath, [tscEntrypoint, ...args], { cwd: desktopRoot });
   assert(compile.status === 0, `TypeScript compile failed: ${compile.output || "unknown error"}`);
@@ -93,6 +75,7 @@ async function validateLifecycleAndContracts() {
   compileDesktopMainTs();
 
   process.env.NODE_ENV = "production";
+  process.env.PROXY_CWD = workspaceRoot;
   process.env.HOST = smokeHost;
   process.env.PORT = String(smokePort);
   process.env.LOG_LEVEL = "INFO";
@@ -102,8 +85,8 @@ async function validateLifecycleAndContracts() {
   process.env.PUTER_DESKTOP_TOKEN_SERVICE = "puter-desktop-task8-smoke";
   process.env.PUTER_DESKTOP_TOKEN_ACCOUNT = "puter-token-task8-smoke";
 
-  const mainIndexPath = pathToFileURL(resolve(tmpOutDir, "index.js")).href;
-  const proxyManagerPath = pathToFileURL(resolve(tmpOutDir, "proxy-manager.js")).href;
+  const mainIndexPath = pathToFileURL(resolve(tmpOutDir, "main", "index.js")).href;
+  const proxyManagerPath = pathToFileURL(resolve(tmpOutDir, "main", "proxy-manager.js")).href;
   const { dispatchIpcCommand } = await import(mainIndexPath);
   const { ProxyManager } = await import(proxyManagerPath);
   let proxyStarted = false;

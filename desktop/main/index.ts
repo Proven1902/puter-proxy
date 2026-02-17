@@ -188,7 +188,7 @@ async function handleProxyChannel(channel: IpcChannel, payload: unknown): Promis
     }
 
     if (channel === IPC_CHANNELS.TOKEN_SAVE) {
-      const token = extractToken(payload);
+      const token = (payload as IpcRequestMap[typeof IPC_CHANNELS.TOKEN_SAVE]).token;
       await tokenStore.saveToken(token);
       applyTokenToRuntime(token);
       await restartProxyIfRunning();
