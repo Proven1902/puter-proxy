@@ -383,7 +383,7 @@ proxy/tests/                    # Task 7 owner (pytest)
 
   **Acceptance Criteria**:
   - [x] `GET /healthz` returns 200 with `{ "status": "ok" }`. Evidence: .sisyphus/evidence/task-2-health.json
-  - [ ] `GET /v1/models` returns OpenAI-style JSON object with keys `object="list"` and `data[]`; each item has non-empty `id`.
+  - [x] `GET /v1/models` returns OpenAI-style JSON object with keys `object="list"` and `data[]`; each item has non-empty `id`. Evidence: .sisyphus/evidence/task-2-models-with-token.json
   - [ ] `POST /v1/chat/completions` with `stream:false` returns 200 JSON including `id`, `object="chat.completion"`, `model`, `choices[0].message.role`, and `choices[0].message.content`.
   - [ ] `stream:true` returns 501 JSON error with `error.code="streaming_not_supported"`, `error.request_id`, and `streaming_not_supported: true`.
   - [ ] Unsupported route probe (`POST /v1/embeddings`) returns 404 structured JSON error.
