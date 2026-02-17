@@ -32,5 +32,4 @@ desktop/.tmp-task8/
 desktop/.build/
 desktop/node_modules/
 
-%TEMP%/
 *.heapsnapshot

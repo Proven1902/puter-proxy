@@ -22,13 +22,6 @@ function assert(condition, message) {
   }
 }
 
-function withEnv(overrides) {
-  return {
-    ...process.env,
-    ...overrides,
-  };
-}
-
 function run(command, args, options = {}) {
   const child = spawnSync(command, args, {
     cwd: options.cwd || workspaceRoot,
