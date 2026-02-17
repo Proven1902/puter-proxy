@@ -1,0 +1,20 @@
+{
+  "packaged_ready": true,
+  "exe_artifacts": [
+    "C:\\Users\\admin\\Desktop\\projects\\puterapp\\desktop\\dist\\Puter Desktop Setup 0.1.0.exe",
+    "C:\\Users\\admin\\Desktop\\projects\\puterapp\\desktop\\dist\\win-unpacked\\Puter Desktop.exe",
+    "C:\\Users\\admin\\Desktop\\projects\\puterapp\\desktop\\dist\\win-unpacked\\resources\\elevate.exe"
+  ],
+  "checks": {
+    "lifecycle_status": "running",
+    "token_masked": false,
+    "secure_store_sentinel_present": true,
+    "healthz_status": 200,
+    "healthz_body": {
+      "status": "ok"
+    },
+    "missing_token_status": 401,
+    "missing_token_code": "token_missing",
+    "preflight_error_code": "python_runtime_missing"
+  }
+}

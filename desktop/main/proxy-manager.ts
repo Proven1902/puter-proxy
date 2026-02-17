@@ -1,6 +1,8 @@
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { spawn, spawnSync, type ChildProcessByStdio } from "node:child_process";
+import { existsSync } from "node:fs";
 import * as net from "node:net";
 import { resolve } from "node:path";
+import type { Readable } from "node:stream";
 
 import { desktopRuntimeConfig } from "./config";
 import type { ProxyStatusPayload } from "./ipc";
@@ -112,11 +114,38 @@ function sanitizeLogMessage(input: string, tokenRaw: string): string {
   return input.split(token).join("[REDACTED_TOKEN]");
 }
 
+type ProxyChildProcess = ChildProcessByStdio<null, Readable, Readable>;
+
+function hasProxyApp(cwd: string): boolean {
+  return existsSync(resolve(cwd, "proxy", "app", "main.py"));
+}
+
+function resolveProxyCwd(): string {
+  const override = process.env.PROXY_CWD?.trim();
+  if (override) {
+    return resolve(override);
+  }
+
+  const candidates = [
+    resolve(__dirname, "..", ".."),
+    resolve(__dirname, "..", "..", "..", ".."),
+    process.cwd(),
+  ];
+
+  for (const candidate of candidates) {
+    if (hasProxyApp(candidate)) {
+      return candidate;
+    }
+  }
+
+  return candidates[0];
+}
+
 function baseOptions(): ProxyManagerOptions {
   const host = desktopRuntimeConfig.host;
   const port = desktopRuntimeConfig.port;
   const pythonPath = process.env.PYTHON_PATH?.trim() || DEFAULT_PYTHON;
-  const cwd = resolve(__dirname, "..", "..");
+  const cwd = resolveProxyCwd();
 
   return {
     host,
@@ -146,7 +175,7 @@ export class ProxyManager {
   private readonly options: ProxyManagerOptions;
 
   private state: ProxyManagerState = "stopped";
-  private process: ChildProcessWithoutNullStreams | null = null;
+  private process: ProxyChildProcess | null = null;
   private lastError: ProxyManagerError | null = null;
   private lastTransitionAt = nowIso();
   private readonly restartAttempts: number[] = [];
@@ -156,6 +185,10 @@ export class ProxyManager {
   private healthPollGeneration = 0;
   private stopRequested = false;
   private puterToken = "";
+
+  private runtimeErrorSnapshot(): ProxyManagerError | null {
+    return this.lastError;
+  }
 
   constructor(options?: Partial<ProxyManagerOptions>) {
     this.options = {
@@ -200,6 +233,7 @@ export class ProxyManager {
     }
 
     this.stopRequested = false;
+    this.ensurePythonRuntimeAvailable();
     await this.ensurePortAvailable();
     await this.startWithRetries();
     return this.status();
@@ -273,6 +307,32 @@ export class ProxyManager {
     throw this.lastError;
   }
 
+  private ensurePythonRuntimeAvailable(): void {
+    const probe = spawnSync(this.options.pythonPath, ["--version"], {
+      stdio: "ignore",
+      windowsHide: true,
+    });
+
+    if (!probe.error) {
+      return;
+    }
+
+    const message = probe.error instanceof Error ? probe.error.message : String(probe.error);
+    if (message.toLowerCase().includes("enoent") || message.toLowerCase().includes("not found")) {
+      this.setError({
+        code: "python_runtime_missing",
+        message: `Python runtime not found: ${this.options.pythonPath}`,
+      });
+      throw this.lastError;
+    }
+
+    this.setError({
+      code: "internal_error",
+      message: `Failed to validate python runtime: ${message}`,
+    });
+    throw this.lastError;
+  }
+
   private async spawnProxy(): Promise<void> {
     this.transitionTo("starting");
     this.lastError = null;
@@ -310,11 +370,20 @@ export class ProxyManager {
       throw this.lastError;
     }
 
-    this.attachProcessListeners(this.process);
+    const spawned = this.process;
+    if (!spawned) {
+      this.setError({
+        code: "internal_error",
+        message: "Proxy process spawn returned no process handle",
+      });
+      throw this.lastError;
+    }
+
+    this.attachProcessListeners(spawned);
 
     const becameHealthy = await this.waitUntilHealthy(this.options.startupTimeoutMs);
     if (!becameHealthy) {
-      const startupError = this.lastError;
+      const startupError = this.runtimeErrorSnapshot();
       if (startupError && startupError.code !== "proxy_unavailable") {
         this.process?.kill();
         this.process = null;
@@ -344,7 +413,7 @@ export class ProxyManager {
     this.startHealthPolling();
   }
 
-  private attachProcessListeners(proc: ChildProcessWithoutNullStreams): void {
+  private attachProcessListeners(proc: ProxyChildProcess): void {
     proc.stdout.on("data", (chunk: Buffer | string) => {
       this.log("INFO", "proxy.stdout", sanitizeLogMessage(String(chunk).trim(), this.puterToken));
     });

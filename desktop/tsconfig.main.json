@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    "outDir": ".build/main",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "main/config.ts",
+    "main/ipc.ts",
+    "main/security-store.ts",
+    "main/proxy-manager.ts",
+    "main/index.ts",
+    "main/runtime.ts",
+    "preload/api.ts",
+    "preload/runtime.ts"
+  ]
+}

@@ -822,6 +822,60 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-8-security-hardening.txt
   ```
 
+- [ ] 9. Migrate secure token backend from keytar to Electron safeStorage
+
+  **What to do**:
+  - Replace `keytar` usage in `desktop/main/security-store.ts` with Electron `safeStorage` + local encrypted blob store abstraction.
+  - Keep external token contract unchanged (`token_masked` only, no plaintext token field in status/introspection).
+  - Ensure migration path reads existing keytar-backed state once and re-persists into safeStorage-backed format, then removes legacy sentinel-only assumptions.
+  - Remove `keytar` dependency from `desktop/package.json` and lockfile.
+
+  **Must NOT do**:
+  - No plaintext token persistence.
+  - No downgrade of existing deterministic error codes (`secure_store_unavailable`, etc.).
+  - No renderer direct access to token material.
+
+  **Recommended Agent Profile**:
+  - **Category**: `unspecified-high`
+  - **Skills**: `quick`, `dev-browser`
+
+  **Parallelization**:
+  - **Can Run In Parallel**: NO
+  - **Parallel Group**: Post-Task-8 hardening
+  - **Blocks**: Future release hardening sign-off
+  - **Blocked By**: 8
+
+  **Acceptance Criteria**:
+  - [ ] `desktop/main/security-store.ts` no longer imports `keytar`.
+  - [ ] `desktop/package.json` and lockfile contain no `keytar` runtime dependency.
+  - [ ] `npm --prefix desktop run smoke:packaged` passes with safeStorage backend.
+  - [ ] Existing Task 8 evidence checks for masked-only token contract remain green.
+  - [ ] Deterministic failure path for unavailable secure backend remains machine-parseable.
+
+  **Agent-Executed QA Scenarios**:
+
+  ```text
+  Scenario: Safe storage backend works across restart
+    Tool: Bash + Playwright
+    Preconditions: Desktop app built with safeStorage backend
+    Steps:
+      1. Save token through UI
+      2. Restart app
+      3. Assert token remains masked-only and chat/model calls succeed
+    Expected Result: Persistence works without keytar dependency
+    Evidence: .sisyphus/evidence/task-9-safe-storage-restart.txt
+
+  Scenario: Legacy keytar-era state migration
+    Tool: Bash
+    Preconditions: Existing task8 secure-store sentinel file and token saved in prior format
+    Steps:
+      1. Launch app with migration-enabled build
+      2. Trigger token read path
+      3. Assert migration occurs and no plaintext token is written
+    Expected Result: Backward-compatible migration without leakage
+    Evidence: .sisyphus/evidence/task-9-migration.txt
+  ```
+
 ---
 
 ## Commit Strategy

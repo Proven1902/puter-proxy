@@ -1,0 +1,30 @@
+
+> puter-desktop@0.1.0 dist:win
+> npm run build && npm run build:main && electron-builder --config electron-builder.yml --win --x64 --publish never
+
+
+> puter-desktop@0.1.0 build
+> vite build --config renderer/vite.config.ts
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 51 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                 [39m[1m[2m  0.42 kB[22m[1m[22m[2m │ gzip:  0.28 kB[22m
+[2mdist/[22m[35massets/index-DoG73REu.css  [39m[1m[2m  2.36 kB[22m[1m[22m[2m │ gzip:  0.95 kB[22m
+[2mdist/[22m[36massets/index-CDCbIWrt.js   [39m[1m[2m237.76 kB[22m[1m[22m[2m │ gzip: 75.96 kB[22m
+[32m✓ built in 641ms[39m
+
+> puter-desktop@0.1.0 build:main
+> tsc -p tsconfig.main.json
+
+  • electron-builder  version=24.13.3 os=10.0.26100
+  • loaded configuration  file=C:\Users\admin\Desktop\projects\puterapp\desktop\electron-builder.yml
+  • author is missed in the package.json  appPackageFile=C:\Users\admin\Desktop\projects\puterapp\desktop\package.json
+  • rebuilding native dependencies  dependencies=keytar@7.9.0 platform=win32 arch=x64
+  • install prebuilt binary  name=keytar version=7.9.0 platform=win32 arch=x64 napi= 
+  • packaging       platform=win32 arch=x64 electron=31.7.7 appOutDir=dist\win-unpacked
+  • default Electron icon is used  reason=application icon is not set
+  • building        target=nsis file=dist\Puter Desktop Setup 0.1.0.exe archs=x64 oneClick=false perMachine=false
+  • building block map  blockMapFile=dist\Puter Desktop Setup 0.1.0.exe.blockmap

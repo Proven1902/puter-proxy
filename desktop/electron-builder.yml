@@ -1,0 +1,33 @@
+appId: com.puter.desktop
+productName: Puter Desktop
+directories:
+  output: dist
+files:
+  - from: .
+    filter:
+      - package.json
+      - .build/**
+      - node_modules/**
+      - "!node_modules/.bin/**"
+      - "!node_modules/**/{test,tests,__tests__,example,examples}/**"
+      - "!node_modules/**/*.d.ts"
+      - "!node_modules/**/*.map"
+      - "!renderer/src/**"
+      - renderer/dist/**
+  - from: ../proxy
+    to: proxy
+    filter:
+      - "**/*.py"
+      - "**/*.pyi"
+      - "!**/__pycache__/**"
+      - "!**/*.pyc"
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  allowElevation: true
+  perMachine: false
+  allowToChangeInstallationDirectory: true

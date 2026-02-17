@@ -51,14 +51,14 @@ async function restartProxyIfRunning(): Promise<void> {
   }
 }
 
-function initializeTokenState(): void {
+async function initializeTokenState(): Promise<void> {
   let token = "";
 
   if (desktopRuntimeConfig.puterToken) {
     token = desktopRuntimeConfig.puterToken;
   } else {
     try {
-      token = tokenStore.loadToken();
+      token = await tokenStore.loadToken();
     } catch {
       token = "";
     }
@@ -67,7 +67,7 @@ function initializeTokenState(): void {
   applyTokenToRuntime(token);
 }
 
-initializeTokenState();
+const tokenReady = initializeTokenState();
 
 function normalizeError(err: unknown): ProxyManagerError {
   if (
@@ -165,6 +165,8 @@ function assertPayload<C extends IpcChannel>(
 
 async function handleProxyChannel(channel: IpcChannel, payload: unknown): Promise<IpcResponseEnvelope<unknown>> {
   try {
+    await tokenReady;
+
     if (channel === IPC_CHANNELS.PROXY_START) {
       return okResponse<IpcResponseMap["proxy.start"]>(await proxyManager.start());
     }
@@ -186,15 +188,15 @@ async function handleProxyChannel(channel: IpcChannel, payload: unknown): Promis
     }
 
     if (channel === IPC_CHANNELS.TOKEN_SAVE) {
-      const token = extractToken(payload);
-      tokenStore.saveToken(token);
+      const token = (payload as IpcRequestMap[typeof IPC_CHANNELS.TOKEN_SAVE]).token;
+      await tokenStore.saveToken(token);
       applyTokenToRuntime(token);
       await restartProxyIfRunning();
       return okResponse<IpcResponseMap["token.save"]>({ saved: true });
     }
 
     if (channel === IPC_CHANNELS.TOKEN_CLEAR) {
-      tokenStore.clearToken();
+      await tokenStore.clearToken();
       applyTokenToRuntime("");
       await restartProxyIfRunning();
       return okResponse<IpcResponseMap["token.clear"]>({ cleared: true });

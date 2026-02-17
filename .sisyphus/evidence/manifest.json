@@ -1,6 +1,6 @@
 {
   "plan": ".sisyphus/plans/puter-electron-openai-proxy.md",
-  "task": "Task 1-7",
+  "task": "Task 1-8",
   "artifacts": [
     {
       "path": ".sisyphus/evidence/task-1-dev-startup.txt",
@@ -141,6 +141,26 @@
     {
       "path": ".sisyphus/evidence/task-7-stream-test.txt",
       "description": "Task 7 targeted stream=true rejection regression evidence"
+    },
+    {
+      "path": ".sisyphus/evidence/task-8-dist.txt",
+      "description": "Task 8 Windows package build command output"
+    },
+    {
+      "path": ".sisyphus/evidence/task-8-packaged-smoke.json",
+      "description": "Task 8 packaged smoke checks summary (exe + lifecycle + healthz + missing token contract)"
+    },
+    {
+      "path": ".sisyphus/evidence/task-8-package-happy.txt",
+      "description": "Task 8 packaged happy-path evidence markers"
+    },
+    {
+      "path": ".sisyphus/evidence/task-8-missing-token.txt",
+      "description": "Task 8 missing-token contract and preflight deterministic error evidence"
+    },
+    {
+      "path": ".sisyphus/evidence/task-8-security-hardening.txt",
+      "description": "Task 8 packaged runtime security hardening evidence (keychain-backed + masked-only token contract)"
     }
   ]
 }

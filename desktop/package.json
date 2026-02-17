@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "commonjs",
+  "main": ".build/main/main/runtime.js",
   "description": "Electron control plane + React renderer",
   "scripts": {
     "task3:smoke": "node scripts/task3-smoke.mjs",
@@ -12,27 +13,32 @@
     "task7:smoke": "node scripts/task7-smoke.mjs",
     "dev": "vite --config renderer/vite.config.ts",
     "build": "vite build --config renderer/vite.config.ts",
+    "build:main": "tsc -p tsconfig.main.json",
     "lint": "eslint --config renderer/eslint.config.mjs \"renderer/src/**/*.{ts,tsx}\"",
     "test": "vitest run --config renderer/vitest.config.ts",
     "smoke:dev": "node -e \"console.log('desktop_ready=true');console.log('proxy_ready=true')\"",
-    "smoke:packaged": "node -e \"console.log('packaged_ready=true');console.log('proxy_ready=true')\""
+    "dist:win": "npm run build && npm run build:main && electron-builder --config electron-builder.yml --win --x64 --publish never",
+    "smoke:packaged": "node scripts/task8-smoke.mjs"
   },
   "dependencies": {
+    "keytar": "^7.9.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.36.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
-    "@eslint/js": "^9.36.0",
+    "@types/node": "^25.2.3",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
     "@vitejs/plugin-react": "^5.0.3",
-    "@types/node": "^25.2.3",
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

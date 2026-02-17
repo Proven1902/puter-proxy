@@ -1,0 +1,9 @@
+{
+  "secure_store_path": "C:\\Users\\admin\\Desktop\\projects\\puterapp\\desktop\\.tmp-task8\\secure-store.json",
+  "secure_store_sentinel_present": true,
+  "token_service_override": "puter-desktop-task8-smoke",
+  "token_account_override": "puter-token-task8-smoke",
+  "token_field_exposed": false,
+  "token_masked_only_contract": true,
+  "preflight_error_code": "python_runtime_missing"
+}
