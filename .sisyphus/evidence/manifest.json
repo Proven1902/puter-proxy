@@ -160,7 +160,15 @@
     },
     {
       "path": ".sisyphus/evidence/task-8-security-hardening.txt",
-      "description": "Task 8 packaged runtime security hardening evidence (keychain-backed + masked-only token contract)"
+      "description": "Task 8 packaged runtime security hardening evidence (safeStorage-backed + masked-only token contract)"
+    },
+    {
+      "path": ".sisyphus/evidence/task-9-safe-storage-restart.txt",
+      "description": "Task 9 safeStorage persistence across restart evidence"
+    },
+    {
+      "path": ".sisyphus/evidence/task-9-migration.txt",
+      "description": "Task 9 legacy keytar-era sentinel migration evidence"
     }
   ]
 }
