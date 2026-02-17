@@ -28,4 +28,9 @@ desktop/dist/
 desktop/.tmp-task3/
 desktop/.tmp-task5/
 desktop/.tmp-task7/
+desktop/.tmp-task8/
+desktop/.build/
 desktop/node_modules/
+
+%TEMP%/
+*.heapsnapshot

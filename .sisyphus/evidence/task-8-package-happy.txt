@@ -1,0 +1,5 @@
+task8_packaged_happy=true
+exe_count=3
+healthz_status=200
+missing_token_status=401
+missing_token_code=token_missing
