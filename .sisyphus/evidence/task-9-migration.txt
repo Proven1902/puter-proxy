@@ -1,0 +1,4 @@
+task9_legacy_keytar_migration_ok=true
+migrated_status_masked=true
+legacy_removed=true
+store_backend=electron.safeStorage
