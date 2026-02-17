@@ -141,8 +141,8 @@ async function validateLifecycleAndContracts() {
     assert(!("token" in statusAfterSave.data), "proxy.status must not expose plaintext token field after token.save");
 
     secureStoreSentinelPresent =
-      existsSync(secureStorePath) && readFileSync(secureStorePath, "utf-8").includes("KEYCHAIN_BACKED");
-    assert(secureStoreSentinelPresent, "secure-store sentinel must indicate keychain-backed storage after token.save");
+      existsSync(secureStorePath) && readFileSync(secureStorePath, "utf-8").includes("SAFE_STORAGE_BACKED");
+    assert(secureStoreSentinelPresent, "secure-store sentinel must indicate safeStorage-backed storage after token.save");
 
     const clearAfterSave = await dispatchIpcCommand("token.clear", {});
     assert(clearAfterSave && clearAfterSave.ok === true, "token.clear must succeed after token.save");
