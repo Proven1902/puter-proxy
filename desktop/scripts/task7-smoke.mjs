@@ -144,6 +144,7 @@ async function runIntegrationAndContracts() {
   });
 
   let dispatchIpcCommand;
+  let stopSucceeded = true;
 
   try {
     compileDesktopMainTs();
@@ -229,10 +230,15 @@ async function runIntegrationAndContracts() {
   } finally {
     if (typeof dispatchIpcCommand === "function") {
       const stop = await dispatchIpcCommand("proxy.stop", {});
-      assert(stop && stop.ok === true, "proxy.stop must succeed after integration validation");
+      if (!(stop && stop.ok === true)) {
+        stopSucceeded = false;
+      }
     }
+
     restoreEnv();
   }
+
+  assert(stopSucceeded, "proxy.stop must succeed after integration validation");
 }
 
 async function main() {
