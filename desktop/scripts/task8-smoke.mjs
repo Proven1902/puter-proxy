@@ -141,8 +141,8 @@ async function validateLifecycleAndContracts() {
     assert(!("token" in statusAfterSave.data), "proxy.status must not expose plaintext token field after token.save");
 
     secureStoreSentinelPresent =
-      existsSync(secureStorePath) && readFileSync(secureStorePath, "utf-8").includes("KEYCHAIN_BACKED");
-    assert(secureStoreSentinelPresent, "secure-store sentinel must indicate keychain-backed storage after token.save");
+      existsSync(secureStorePath) && readFileSync(secureStorePath, "utf-8").includes("SAFE_STORAGE_BACKED");
+    assert(secureStoreSentinelPresent, "secure-store sentinel must indicate safeStorage-backed storage after token.save");
 
     const clearAfterSave = await dispatchIpcCommand("token.clear", {});
     assert(clearAfterSave && clearAfterSave.ok === true, "token.clear must succeed after token.save");
@@ -215,9 +215,15 @@ async function main() {
 
   const checks = await validateLifecycleAndContracts();
 
+  const packagedHelperPath = resolve(desktopRoot, "dist", "win-unpacked", "resources", "safe-storage-helper.js");
+  const safeStorageHelperPackaged = existsSync(packagedHelperPath);
+  assert(safeStorageHelperPackaged, `packaged helper script missing: ${packagedHelperPath}`);
+
   const securityHardening = {
     secure_store_path: secureStorePath,
     secure_store_sentinel_present: checks.secure_store_sentinel_present,
+    safe_storage_helper_packaged: safeStorageHelperPackaged,
+    safe_storage_helper_path: packagedHelperPath,
     token_service_override: process.env.PUTER_DESKTOP_TOKEN_SERVICE,
     token_account_override: process.env.PUTER_DESKTOP_TOKEN_ACCOUNT,
     token_field_exposed: false,
