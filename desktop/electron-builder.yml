@@ -13,6 +13,7 @@ files:
       - "!node_modules/**/*.d.ts"
       - "!node_modules/**/*.map"
       - "!renderer/src/**"
+      - renderer/dist/**
   - from: ../proxy
     to: proxy
     filter:
