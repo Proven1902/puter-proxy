@@ -80,11 +80,11 @@ Deliver a reliable local bridge so OpenAI-compatible clients can call Puter thro
 - Windows packaging scripts + runbook
 
 ### Definition of Done
-- [ ] Desktop app can start/stop/restart local proxy from UI (`task-3` and `task-4` lifecycle scenarios pass).
-- [ ] `GET /v1/models` and `POST /v1/chat/completions` return OpenAI-compatible JSON contracts (contract checks pass in Task 2 + Task 7).
-- [ ] `stream=true` returns explicit structured `501` JSON error with `streaming_not_supported: true`.
-- [ ] Secret redaction gate passes (0 leaked token matches across logs/evidence outputs).
-- [ ] Final verification contract passes (`test` + `lint` + `build` + evidence checks) and artifacts exist in `.sisyphus/evidence/`.
+- [x] Desktop app can start/stop/restart local proxy from UI (`task-3` and `task-4` lifecycle scenarios pass).
+- [x] `GET /v1/models` and `POST /v1/chat/completions` return OpenAI-compatible JSON contracts (contract checks pass in Task 2 + Task 7).
+- [x] `stream=true` returns explicit structured `501` JSON error with `streaming_not_supported: true`.
+- [x] Secret redaction gate passes (0 leaked token matches across logs/evidence outputs).
+- [x] Final verification contract passes (`test` + `lint` + `build` + evidence checks) and artifacts exist in `.sisyphus/evidence/`.
 
 ### Must Have
 - Local bind only (`127.0.0.1`), no LAN exposure.
@@ -288,7 +288,7 @@ proxy/tests/                    # Task 7 owner (pytest)
   - `{ "ok": true, "data": { ... }, "request_id": "..." }`
   - `{ "ok": false, "error": { "code": "...", "message": "...", "details": { ... }, "request_id": "..." } }`
 
-- [ ] 1. Scaffold workspace and baseline contracts
+- [x] 1. Scaffold workspace and baseline contracts
 
   **What to do**:
   - Create project layout (`desktop/`, `proxy/`, shared `schemas/` or contracts doc).
@@ -351,7 +351,7 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-1-invalid-config.txt
   ```
 
-- [ ] 2. Build FastAPI OpenAI-compatible MVP endpoints
+- [x] 2. Build FastAPI OpenAI-compatible MVP endpoints
 
   **What to do**:
   - Implement `GET /healthz`, `GET /v1/models`, `POST /v1/chat/completions`.
@@ -424,7 +424,7 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-2-stream-reject.json
   ```
 
-- [ ] 3. Implement Electron main-process ProxyManager
+- [x] 3. Implement Electron main-process ProxyManager
 
   **What to do**:
   - Implement start/stop/restart/status API in main process.
@@ -504,7 +504,7 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-3-python-missing.json
   ```
 
-- [ ] 4. Build React desktop control UI
+- [x] 4. Build React desktop control UI
 
   **What to do**:
   - Implement controls: token input/save, start/stop/restart, status indicator, log tail panel.
@@ -582,7 +582,7 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-4-lifecycle-tuning.txt
   ```
 
-- [ ] 5. Add secure token persistence and request authorization plumbing
+- [x] 5. Add secure token persistence and request authorization plumbing
 
   **What to do**:
   - Store Puter token in Windows secure store abstraction (e.g., keytar-backed).
@@ -637,7 +637,7 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-5-redaction-check.txt
   ```
 
-- [ ] 6. Implement structured errors, logging, and guardrails
+- [x] 6. Implement structured errors, logging, and guardrails
 
   **What to do**:
   - Define API error schema (code/message/details/request_id).
@@ -690,7 +690,7 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-6-bind-guardrail.txt
   ```
 
-- [ ] 7. Add tests-after implementation (proxy + desktop logic)
+- [x] 7. Add tests-after implementation (proxy + desktop logic)
 
   **What to do**:
   - Add proxy tests for health/models/chat/error/stream rejection.
@@ -744,7 +744,7 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-7-stream-test.txt
   ```
 
-- [ ] 8. Package Windows MVP and run final agent QA pass
+- [x] 8. Package Windows MVP and run final agent QA pass
 
   **What to do**:
   - Build Windows distributable for desktop app.
@@ -822,7 +822,7 @@ proxy/tests/                    # Task 7 owner (pytest)
     Evidence: .sisyphus/evidence/task-8-security-hardening.txt
   ```
 
-- [ ] 9. Migrate secure token backend from keytar to Electron safeStorage
+- [x] 9. Migrate secure token backend from keytar to Electron safeStorage
 
   **What to do**:
   - Replace `keytar` usage in `desktop/main/security-store.ts` with Electron `safeStorage` + local encrypted blob store abstraction.
