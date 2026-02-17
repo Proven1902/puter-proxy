@@ -145,35 +145,43 @@ function helperScriptPath(): string {
   }
 
   const resourcesPath = process.resourcesPath?.trim();
+  const execDir = process.execPath ? dirname(process.execPath) : "";
   const candidates = [
     resolve(__dirname, SAFE_STORAGE_HELPER_SCRIPT),
     resolve(__dirname, "main", SAFE_STORAGE_HELPER_SCRIPT),
+    resolve(__dirname, "..", "main", SAFE_STORAGE_HELPER_SCRIPT),
     ...(resourcesPath
       ? [
           resolve(resourcesPath, "app.asar.unpacked", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
-          resolve(resourcesPath, "app.asar", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
           resolve(resourcesPath, "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+          resolve(resourcesPath, "app", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
         ]
       : []),
-    resolve(dirname(process.execPath), "resources", "app.asar.unpacked", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
-    resolve(dirname(process.execPath), "resources", "app.asar", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+    ...(execDir
+      ? [
+          resolve(execDir, "resources", "app.asar.unpacked", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+          resolve(execDir, "resources", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+          resolve(execDir, "resources", "app", "dist", "main", SAFE_STORAGE_HELPER_SCRIPT),
+        ]
+      : []),
   ];
 
-  for (const candidate of candidates) {
+  const uniqueCandidates = Array.from(new Set(candidates));
+
+  for (const candidate of uniqueCandidates) {
     if (existsSync(candidate)) {
       return candidate;
     }
   }
 
-  return candidates[0];
+  throw new TokenSecureStoreError(
+    `safeStorage helper is missing. searched: ${uniqueCandidates.join(", ")}`,
+  );
 }
 
 function runSafeStorageHelper(mode: "encrypt" | "decrypt", payloadB64: string): string {
   const helper = helperScriptPath();
   const electronBinary = resolveElectronBinaryPath();
-  if (!existsSync(helper)) {
-    throw new TokenSecureStoreError(`safeStorage helper is missing: ${helper}`);
-  }
 
   const helperEnv: Record<string, string | undefined> = {
     ...process.env,
