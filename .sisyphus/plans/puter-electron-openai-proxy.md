@@ -451,10 +451,10 @@ proxy/tests/                    # Task 7 owner (pytest)
   - `https://docs.puter.com/security/` - user auth/security principles informing local safety defaults.
 
   **Acceptance Criteria**:
-  - [ ] Start/stop/restart/status IPC endpoints work with strict allowlist; non-allowlisted channels are rejected.
-  - [ ] Crash loop handling enters error state after bounded retries (max 3 attempts within 60 seconds).
-  - [ ] Port collision (`127.0.0.1:11435` already in use) fails deterministically with `port_in_use` error code.
-  - [ ] Missing Python runtime fails deterministically with `python_runtime_missing` error code.
+  - [x] Start/stop/restart/status IPC endpoints work with strict allowlist; non-allowlisted channels are rejected. Evidence: .sisyphus/evidence/task-3-smoke-summary.json, .sisyphus/evidence/task-3-lifecycle.json
+  - [x] Crash loop handling enters error state after bounded retries (max 3 attempts within 60 seconds). Evidence: .sisyphus/evidence/task-3-retry-failure.txt
+  - [x] Port collision (`127.0.0.1:11435` already in use) fails deterministically with `port_in_use` error code. Evidence: .sisyphus/evidence/task-3-port-in-use.json
+  - [x] Missing Python runtime fails deterministically with `python_runtime_missing` error code. Evidence: .sisyphus/evidence/task-3-python-missing.json
 
   **Agent-Executed QA Scenarios**:
 
@@ -543,7 +543,7 @@ proxy/tests/                    # Task 7 owner (pytest)
   - [ ] UI parity with `react-app7.js` is proven by passing all relevant Design QA Matrix rows and evidence files (`ui-overview-initial.png`, `ui-navigation-routes.png`, `ui-proxy-running.png`, `ui-proxy-stopped.png`, `ui-proxy-error.png`).
   - [ ] Error/warn banners exist for invalid token, proxy-down, and stream-unsupported cases.
   - [ ] UI never directly accesses process spawn or secure store APIs (IPC-only).
-  - [ ] Lifecycle integration tuning passes: rapid `start/stop/restart` interactions do not produce stale health-poll state/log artifacts, and final status is deterministic (verified by Task 4 lifecycle tuning evidence).
+  - [x] Lifecycle integration tuning passes: rapid `start/stop/restart` interactions do not produce stale health-poll state/log artifacts, and final status is deterministic (verified by Task 4 lifecycle tuning evidence). Evidence: .sisyphus/evidence/task-4-lifecycle-tuning.txt
 
   **Agent-Executed QA Scenarios**:
 
@@ -608,9 +608,9 @@ proxy/tests/                    # Task 7 owner (pytest)
   - `https://docs.puter.com/security/` - secure handling expectations.
 
   **Acceptance Criteria**:
-  - [ ] Saved token is retrievable by app restart but never shown in plaintext.
+  - [x] Saved token is retrievable by app restart but never shown in plaintext. Evidence: .sisyphus/evidence/task-5-persist-restart.txt
   - [ ] API requests succeed using secure-store token retrieval path.
-  - [ ] Logs contain no full token strings (verified against `proxy/logs/latest.log`).
+  - [x] Logs contain no full token strings (verified against `proxy/logs/latest.log`). Evidence: .sisyphus/evidence/task-5-redaction-check.txt
   - [ ] In packaged MVP, secure store is the only persistent token source (env token allowed in dev mode only).
 
   **Agent-Executed QA Scenarios**:
@@ -663,8 +663,8 @@ proxy/tests/                    # Task 7 owner (pytest)
 
   **Acceptance Criteria**:
   - [ ] All error paths return stable JSON schema `{ error: { code, message, details?, request_id } }`.
-  - [ ] Startup fails if host != `127.0.0.1` (no overrides allowed in MVP).
-  - [ ] Error code set includes: `invalid_request`, `unauthorized`, `token_missing`, `model_not_found`, `streaming_not_supported`, `upstream_timeout`, `upstream_error`, `proxy_unavailable`, `port_in_use`, `python_runtime_missing`, `internal_error`.
+  - [x] Startup fails if host != `127.0.0.1` (no overrides allowed in MVP). Evidence: .sisyphus/evidence/task-6-bind-guardrail.txt
+  - [x] Error code set includes: `invalid_request`, `unauthorized`, `token_missing`, `model_not_found`, `streaming_not_supported`, `upstream_timeout`, `upstream_error`, `proxy_unavailable`, `port_in_use`, `python_runtime_missing`, `internal_error`. Evidence: .sisyphus/evidence/task-6-error-codes.json
 
   **Agent-Executed QA Scenarios**:
 
@@ -714,11 +714,11 @@ proxy/tests/                    # Task 7 owner (pytest)
   - Puter API docs used in adapter behavior tests (`chat`, `listModels`).
 
   **Acceptance Criteria**:
-  - [ ] Proxy tests pass.
-  - [ ] UI/unit tests pass.
-  - [ ] Integration test validates chat flow through desktop-managed proxy.
+  - [x] Proxy tests pass. Evidence: .sisyphus/evidence/task-7-tests.txt
+  - [x] UI/unit tests pass. Evidence: .sisyphus/evidence/task-7-tests.txt
+  - [x] Integration test validates chat flow through desktop-managed proxy. Evidence: .sisyphus/evidence/task-7-tests.txt
   - [ ] Contract tests assert unsupported route behavior (`/v1/embeddings` -> 404 structured error).
-  - [ ] Contract tests assert `stream:true` rejection semantics (`501` + `streaming_not_supported`).
+  - [x] Contract tests assert `stream:true` rejection semantics (`501` + `streaming_not_supported`). Evidence: .sisyphus/evidence/task-7-stream-test.txt
 
   **Agent-Executed QA Scenarios**:
 
@@ -775,13 +775,13 @@ proxy/tests/                    # Task 7 owner (pytest)
   - All previous task outputs + evidence folder.
 
   **Acceptance Criteria**:
-  - [ ] `npm --prefix desktop run dist:win` exits `0` and creates at least one `.exe` under `desktop/dist/`.
-  - [ ] Packaged app launches and can control proxy lifecycle.
-  - [ ] API smoke checks pass against packaged runtime.
+  - [x] `npm --prefix desktop run dist:win` exits `0` and creates at least one `.exe` under `desktop/dist/`. Evidence: .sisyphus/evidence/task-8-dist.txt, .sisyphus/evidence/task-8-packaged-smoke.json
+  - [x] Packaged app launches and can control proxy lifecycle. Evidence: .sisyphus/evidence/task-8-packaged-smoke.json
+  - [x] API smoke checks pass against packaged runtime. Evidence: .sisyphus/evidence/task-8-packaged-smoke.json
   - [ ] `npm --prefix desktop run smoke:packaged` exits `0` and captures packaged runtime evidence.
-  - [ ] Preflight checks detect runtime prerequisites and return deterministic error codes when missing.
-  - [ ] Packaged runtime uses OS-native keychain-backed token secret path (no deterministic key derivation fallback from public machine attributes).
-  - [ ] Security audit confirms no plaintext token exposure through externally reachable status/introspection contracts (masked-only token metadata).
+  - [x] Preflight checks detect runtime prerequisites and return deterministic error codes when missing. Evidence: .sisyphus/evidence/task-8-missing-token.txt
+  - [x] Packaged runtime uses OS-native keychain-backed token secret path (no deterministic key derivation fallback from public machine attributes). Evidence: .sisyphus/evidence/task-8-security-hardening.txt
+  - [x] Security audit confirms no plaintext token exposure through externally reachable status/introspection contracts (masked-only token metadata). Evidence: .sisyphus/evidence/task-8-security-hardening.txt
   - [ ] Evidence bundle complete under `.sisyphus/evidence/` with a valid `manifest.json` listing required artifacts.
 
   **Agent-Executed QA Scenarios**:
